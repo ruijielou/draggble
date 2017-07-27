@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+  <head>
+    <meta content="text/html" charset="utf-8">
+    <style type="text/css">
+      #dragContainer{width:120px;height:80px;position: absolute}
+      #drager{width:100%;height:100%;background-color: #3A2885;border: 1px solid #dddddd;}
+      #zoom{position: absolute;width:20px;height:20px;background-color: #000000;right:0;bottom: 0;}
+    </style>
+  </head>
+  <body>
+    <div id="dragContainer">
+      <div id="drager"></div>
+      <div id="zoom"></div>
+    </div>
+    <script type="text/javascript">
+      (function(window){
+        function Drag(drager,dragContainer)
+        {
+          this.drager=$$(drager);
+          this.dragContainer=$$(dragContainer);
+          this.drager.style.cursor="move";
+          this.DragHandler();
+        }
+        Drag.prototype={
+          DragHandler:function()
+          {
+            var drager=this.drager;
+            var dragContainer=this.dragContainer;
+            drager.onmousedown=function(e)
+            {
+              var e=e||window.event;
+              var oldLeft=dragContainer.offsetLeft;
+              var oldTop=dragContainer.offsetTop;
+              var oldX=e.clientX;
+              var oldY=e.clientY;
+              document.onmousemove=function(e)
+              {
+                var e=e||window.event;
+                var mouseX=e.clientX;
+                var mouseY=e.clientY;
+                var newX=parseInt(mouseX)-parseInt(oldX)+parseInt(oldLeft);
+                var newY=parseInt(mouseY)-parseInt(oldY)+parseInt(oldTop);
+                dragContainer.style.left=newX+"px";
+                dragContainer.style.top=newY+"px";
+              }
+              document.onmouseup=function(e)
+              {
+                document.onmousemove=null;
+                document.onmouseup=null;
+              }
+            }
+          }
+        }
+        function Zoom(drager,dragContainer,zoom)
+        {
+          this.dragContainer=$$(dragContainer);
+          this.defaultWH={"width":this.dragContainer.offsetWidth,"height":this.dragContainer.offsetHeight};
+          var drag=new Drag(drager,dragContainer);
+          this.zoom=$$(zoom);
+          this.zoom.style.cursor="se-resize";
+          this.goMove();
+        }
+        Zoom.prototype={
+          goMove:function()
+          {
+            var dragContainer=this.dragContainer;
+            var defaultWH=this.defaultWH;
+            var zoom=this.zoom;
+            zoom.onmousedown=function(e)
+            {
+              var e=e||window.event;
+              var oldLeft=zoom.offsetLeft;
+              var oldTop=zoom.offsetTop;
+              var oldX=e.clientX;
+              var oldY=e.clientY;
+              document.onmousemove=function(e)
+              {
+                var e=e||window.event;
+                var newX=e.clientX;
+                var newY=e.clientY;
+                var w=newX-oldX+oldLeft+zoom.offsetWidth;
+                var h=newY-oldY+oldTop+zoom.offsetHeight;
+                w=Math.max(w,defaultWH.width);
+                h=Math.max(h,defaultWH.height);
+                dragContainer.style.width=w+"px";
+                dragContainer.style.height=h+"px";
+              }
+              document.onmouseup=function(e)
+              {
+                document.onmousemove=null;
+                document.onmouseup=null;
+              }
+            }
+          }
+        }
+        window.Drag=Drag;
+        window.Zoom=Zoom;
+      })(window)
+
+      new Zoom("drager","dragContainer","zoom");
+
+      function $$(id)
+      {
+        return document.getElementById(id);
+      }
+    </script>
+</html>

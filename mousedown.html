@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>jQuery[无需插件]可移动(draggable)和可缩放(sizable)网页元素</title>
+<script src="../node_modules/jQuery/tmp/jquery.js" type="text/javascript"></script>
+<style>
+body,dl,dd,ul,li,h3{ margin:0; padding:0;}
+body{ background:#f0f0f0; font:12px/150% verdana;}
+#hd{ height:100px; background:gray;}
+#ft{ height:30px;}
+#mn{ width:1000px; margin:auto;}
+.draggable{ width:1000px; height:1480px;}
+.drag{ line-height:200%; padding:0 10px;position:absolute; width:auto;/*white-space:nowrap;*/max-width:1000px;}
+.drag b{border-right:1px solid red;border-bottom:1px solid red; width:5px; height:5px; line-height:5px; position:absolute; right:0; bottom:0; cursor:se-resize; display:none;}
+.drag.hv{ cursor:move; background:#ffc;/*border:1px dashed #999;*/}
+.drag.hv b{ display:block;}
+.drag.down{ background:#ccc;}
+
+#d1{ top:319px;left:371px;width:177px;height:38px;}
+#d2{ top:549px;left:402px;}
+#d3{ top:596px;left:403px;}
+#d4{ top:639px;left:365px;}
+#d5{ top:638px;left:525px;width:92px;height:25px;}
+#d6{ top:687px;left:524px;}
+#d7{ top:833px;left:275px;width:664px;height:121px;}
+</style>
+</head>
+<body>
+<div id="hd"></div>
+<div id="mn">
+<dl class="draggable">
+<dd class="drag" id="d1">
+文字区域
+<b></b> </dd>
+<dd class="drag" id="d2">
+文字区域
+<b></b> </dd>
+<dd class="drag" id="d3">
+文字区域
+<b></b> </dd>
+<dd class="drag" id="d4">
+2011-5-5
+<b></b> </dd>
+<dd class="drag" id="d5">
+文字区域
+<b></b> </dd>
+<dd class="drag" id="d6">
+文字区域
+<b></b> </dd>
+<dd class="drag" id="d7">
+<p>6月15日，生乳国家标准颁布实施一年后，素有“中国奶业第一炮筒”之称的广州市奶业协会理事长王丁棉在业内会议上炮轰该标准为“全球最差，是全球乳业的耻辱”，并称“中国生乳标准被个别生产的大企业绑架”。</p>
+<p>这场业内讨论，再一次引发公众对中国乳制品行业的信任危机。</p>
+<p>中国乳品是否真的过低？依据在哪里？修改前的标准是否真的难以达到？昨天，本报再次就此事对话王丁棉。</p>
+<p><strong>【很少的蛋白质，那么高的细菌，那还不如喝开水。消费者钱花了，得不到应有的营养回报，还损害健康】</strong></p>
+<b></b> </dd>
+</dl>
+</div>
+<div id="ft"></div>
+
+<script>
+document.onselectstart=function(){return false};//无法选择内容
+$(document).ready(function(){
+
+//拖动
+var drag=$(".drag");
+
+drag.hover(function(){$(this).addClass("hv")},function(){$(this).removeClass("hv")})
+drag.mousedown(function(myEvent){
+    $(this).addClass("down");
+    myEvent = event || window.event;
+    fx = myEvent.clientX;
+    fy = myEvent.clientY;
+    selfx=$(this).offset().left;
+    selfy=$(this).offset().top;
+    wx=fx-selfx;//得到鼠标位置和元素当前位置之间的差，方便下面mousemove事件里使用clientX(Y)换算对应的top(left)值。
+    wy=fy-selfy;
+    drag=$(this);
+    oldScrollTop  = $(document).scrollTop();
+
+
+    var inZoomArea = (wx>drag.width()+5 && wy+oldScrollTop>drag.height()-5);
+    $(this).text(fy+":"+selfy+":"+oldScrollTop);
+
+
+    if(inZoomArea)
+    {//缩放
+        $(document).bind('mousemove',function(myEvent){
+        myEvent = event || window.event;
+        topy=myEvent.clientY+$(document).scrollTop()-selfy;
+        topx=myEvent.clientX-selfx;
+        drag.css({ "height":topy+3, "width":topx-17});
+        })
+    }else{//移动
+        $(document).bind('mousemove',function(myEvent){
+        myEvent = event || window.event;
+        topy=myEvent.clientY-wy;
+        topx=myEvent.clientX-wx;
+
+        var newScrollTop = $(document).scrollTop();
+        var fixTop = newScrollTop - oldScrollTop;
+        if(fixTop!=0) topy+=fixTop;//修复当拖动到产生滚动条时drag与鼠标位置错位的bug
+
+        drag.css({ "top":topy, "left":topx});
+        })
+    }
+})
+
+drag.mouseup(function(){
+$(document).unbind("mousemove");
+$(this).removeClass("down");
+})
+
+})
+</script>
+</body>
+</html>

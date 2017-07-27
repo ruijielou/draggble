@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <link rel="stylesheet" href="">
+    <style type="text/css" media="screen">
+    .container {
+        height: 500px;
+        width: 500px;
+        margin: 0 auto;
+        border: 1px solid #ccc;
+        position: relative;
+    }
+
+    .container div {
+        width: 200px;
+        height: 200px;
+        background: pink;
+        position: absolute;
+    }
+
+    .left {
+        left: 0;
+        top: 50%;
+    }
+
+    .right {
+        right: 0;
+        top: 0;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class='left'>
+        </div>
+        <div class="right"></div>
+    </div>
+</body>
+<script>
+var container = document.querySelector('.container');
+var left = document.querySelector('.left')
+var right = document.querySelector('.right');
+console.log(left.offsetLeft)
+console.log(right.offsetLeft)
+
+</script>
+</html>

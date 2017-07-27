@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>拖拽</title>
+    <link rel="stylesheet" href="./css/drag2.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="left-menu">
+            <div class="item">
+                <a href="#" draggable data-source-id = "饼状图">饼状图</a>
+            </div>
+            <div class="item">
+                <a href="#" draggable data-source-id = "柱状图">柱状图</a>
+            </div>
+            <div class="item">
+                <a href="#" draggable data-source-id = "折线图">折线图</a>
+            </div>
+            <div class="item">
+                <a href="#" draggable data-source-id = "网格">网格</a>
+            </div>
+            <div class="item">
+                <a href="#" draggable data-source-id = "树形图">树形图</a>
+            </div>
+            <div class="item">
+                <a href="#" draggable data-source-id = "文本和图片">文本和图片</a>
+            </div>
+        </div>
+        <div class="right">
+            <div class="right-title">
+                <h1>我的工作表</h1></div>
+            <div class="right-content" style="width: calc(100%);height: calc(100%);left: calc(0%);top:calc(0%)">
+                <div class="lines"></div>
+                <div class="mask"></div>
+                <!-- 当目标区域为空的时候显示默认的模块儿 -->
+                <div class="showState1">
+                    <h4>列表组为空</h4>
+                </div>
+                <!-- 拖动到目标区域上时showState2显示在目标区域上 -->
+                <div class="showState2" style="width: calc(100%);height: calc(100%);left: calc(0%);top:calc(0%)">
+                    <h4 class="stateTitle">放置内容在此</h4>
+                </div>
+               <!--  <div class="content-menu content-menu1" style="left:0;top:0;width:50%;height:50%;">
+                    <div class="header">
+                        单击添加标题
+                    </div>
+                    <div class="list-content">
+                        内容区域
+                    </div>
+                </div>
+                <div class="content-menu content-menu2" style="left:75%;top: 40%;width:25%;height:25%;">
+                    <div class="header">
+                        单击添加标题
+                    </div>
+                    <div class="list-content">
+                        内容区域
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/drag2.js"></script>
+    <script>
+    var box = document.querySelectorAll('.content-menu');
+    var target = document.querySelector('.right-content');
+    var targetWidth = target.offsetWidth;
+    var pointArr = [];
+    var obj = {};
+    // 先循环每一个未隐藏的div
+    for (i = 0; i < box.length; i++) {
+        var ele = box[i];
+        // 获取当前div的上下左右的距离
+        var left = parseInt(ele.style.left);
+        var right = left + parseInt(ele.style.width);
+        var bottom = 100 - parseInt(ele.style.height);
+        var boxtop = parseInt(ele.style.top);
+        // 然后跟每一个未隐藏的盒子去比较
+        for (var j = 0; j < box.length; j++) {
+            // 获取每一个div的上下左右的距离去比较
+            var eleOther = box[j];
+            var otherleft = parseInt(eleOther.style.left);
+            var otherright = left + parseInt(eleOther.style.width);
+            var otherbottom = 100 - parseInt(eleOther.style.height);
+            var othertop = parseInt(eleOther.style.top);
+            // 如果当前这个的left小于用来比较的div的left就证明在他的左边
+            // 判断在左边并且top值在区间值内
+
+            if(otherleft < left && othertop > boxtop){
+                // 确定宽度
+                obj.width = left - otherleft - parseInt(eleOther.style.width);
+                // 确定生成div的高度
+                obj.height = parseInt(eleOther.style.height);
+                obj.Tleft = obj.width;
+                obj.Ttop = parseInt(eleOther.style.top);
+                pointArr.push(obj);
+                obj = {};
+            }
+             if(otherleft < left && othertop < boxtop){
+
+             }
+        }
+    }
+    // console.log(pointArr);
+    // 确定div的左边位置
+    // 比较当前div的值，Dleft Dtop Dright Dbottom
+    // 某个相等条件的div的值Mleft Mtop Mright Mbottom
+    // 生成虚拟的div Nleft Ntop Nwidth Nheight
+    // 一、判断有div在当前的左边 Dleft > Mleft
+    // 1.Mtop+Mheight>Dtop,确定在当前div的上方
+    //   Nleft = Mleft + Mwidth
+    //   Ntop = Dtop
+    //   Nwidth = Dleft - Nleft
+    //   Nheight = Mtop + Mheight - Dtop
+    // 2.Mtop < Dtop+Dheight，确定在下方
+    //   Nleft = Mleft + Mwidth
+    //   Ntop = Mtop
+    //   Nwidth = Dleft - Nleft
+    //   Nheight = Dheight-(Mtop - Dtop)
+    // 3.Mtop = Dtop，确定在正左方
+    //   Nleft = Mleft + Mwidth
+    //   Ntop = Mtop
+    //   Nwidth = Dleft - Nleft
+    //   如果Mheight大于Dheight
+    //   Nheight = Dheight
+    //   如果Mheight小于Dheight
+    //   Nheight = Mheight
+    //
+    //二、判断有div在当前的上边 首要条件 Mtop < Dtop
+    //1、Mleft + Mwidth > Dleft 确定在当前div的左上方
+    //2、Mleft + Mwidth < Dleft + Dwidth 确定在当前div的右上方
+    //3、Mleft = Dleft
+    //
+    //三、判断有div在当前的右边 首要条件 Mleft > Dleft
+    //1、Mtop + Mheight > Dtop  确定在右上方
+    //2、Mtop < Dtop + Dheight   确定在右下方
+    //3、Mtop = Dtop 确定在正右方，需要判断之间的高度做比较
+    //
+    //四、判断div在当前的下方 首要条件 Dtop + Dheight < Mtop
+    //1、Mleft + Mwidth > Dleft 确定在左下方
+    //2、Mleft < Dleft + Dwidth 确定在右下方
+    //3、Mleft = Dleft left值相同，需要判断其宽度比较，以最小的宽度为准
+    //
+    //五、需要比较一个最小值的left，也就是左边没有任何内容，需要生成靠边的div
+    //判断minleft 确定左边生成一个height等于容器高度的div
+    //Nleft = 0;
+    //Ntop = 0;
+    //Nheight = targetHeight
+    //Nwidth = minleft
+    //
+    //六、需要比较一个最小值的top，上边没有内容，靠最上方生成div
+    //判断一个mintop
+    //这儿需要判断之前加入的数组里有没有Nleft=0 Ntop=0;的坐标点已经存在，如果存在就获取那个Ndiv的Nwidth来作为当前这个的Nleft
+    //Nleft = 0;
+    //Ntop = 0;
+    //Nheight = mintop
+    //Nwidth = targetWidth
+    //
+    //七、需要得到一个最小值的右边的值 minright=Mleft + Mwidth 靠right生成div
+    //判断一个minright
+    //Nleft = minright;
+    //Ntop = 0; 需要去查找一下坐标点数组里有没有top 为0，且宽度等于targetwidth的
+    //Nheight = targetHeight
+    //Nwidth = targetwidth - minright
+    //
+    //八、需要得到一个最小的下边的值， minbottom = Mtop + Mheight;
+    //判断一个minbottom
+    //Nleft = 0;循环查找有没有left等于0，且高度等于targetHeight的，如果有的话就Nleft等于Mdiv的width
+    //Ntop = minbottom;
+    //Nheight = targetHeight - minbottom
+    //Nwidth = targetWidth //如果有left为0的就需要把Nwidth减去Mwidth
+    //
+    </script>
+</body>
+
+</html>

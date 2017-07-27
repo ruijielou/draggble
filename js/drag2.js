@@ -108,7 +108,8 @@ MyDrag.prototype = {
         });
         this.showState2.addEventListener('drop', function(e) {
             that.drop(that, e);
-        })
+
+        });
 
     },
     dragstart: function(that) {
@@ -149,7 +150,7 @@ MyDrag.prototype = {
         height = parseInt(target.offsetHeight / 3);
         //TODO???判断等于三个情况时需要分成左右两个不同宽度的大小的div，或者上下不同高度的两个，分为1+2
         if (x > 0 && x < width && y > 0 && y < height) { //左上 在左邊生成div
-            console.log('左上=================')
+            // console.log('左上=================')
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft;
                 maskTop = targetTop;
@@ -181,7 +182,7 @@ MyDrag.prototype = {
 
 
         } else if (x > 0 && x < width && y < height * 2 && y > height) { //左中 在左邊生成div
-            console.log('左中=================')
+            // console.log('左中=================')
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft;
                 maskTop = targetTop;
@@ -211,7 +212,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > 0 && x < width && y < height * 3 && y > height * 2) { //左下 在左邊生成div
-            console.log('左下=================')
+            // console.log('左下=================')
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft;
                 maskTop = targetTop;
@@ -241,7 +242,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > width && x < width * 2 && y > 0 && y < height) { //上中 div在上邊
-            console.log('上中=================')
+            // console.log('上中=================')
             if (targetHeight <= that.calcYHeight * 3 && targetHeight > that.calcYHeight * 2) {
                 maskLeft = targetLeft;
                 maskTop = targetTop;
@@ -271,7 +272,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop + targetHeight / 2;
             }
         } else if (x > width && x < width * 2 && y > height * 2 && y < height * 3) { //下中 div在下邊
-            console.log('下中=================')
+            // console.log('下中=================')
             if (targetHeight <= that.calcYHeight * 3 && targetHeight > that.calcYHeight * 2) {
                 maskLeft = targetLeft;
                 maskTop = targetTop;
@@ -301,7 +302,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > width * 2 && x < width * 3 && y > 0 && y < height) { //右上 div在右邊
-            console.log('右上=================');
+            // console.log('右上=================');
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft + that.calcXWidth;
                 maskTop = targetTop;
@@ -331,7 +332,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > width * 2 && x < width * 3 && y > height && y < height * 2) { //右中 div在右邊
-            console.log('右中=================')
+            // console.log('右中=================')
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft + that.calcXWidth;
                 maskTop = targetTop;
@@ -361,7 +362,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > width * 2 && x < width * 3 && y > height * 2 && y < height * 3) { //右下 div在右邊
-            console.log('右下=================')
+            // console.log('右下=================')
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft + that.calcXWidth;
                 maskTop = targetTop;
@@ -391,7 +392,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > width && x < width * 2 && y > height && y < height * 2) { //中間 div跟target一樣大小
-            console.log('中间=================')
+            // console.log('中间=================')
             maskLeft = targetLeft;
             maskTop = targetTop;
             maskWidth = targetWidth;
@@ -411,7 +412,7 @@ MyDrag.prototype = {
     drop: function(that, e) {
 
         var target = that.dropTarget;
-        console.log(target)
+        // console.log(target)
         var html = '',
             header = '',
             listContent = '';
@@ -440,7 +441,7 @@ MyDrag.prototype = {
 
         html.classList.add('content-menu');
         var str = e.dataTransfer.getData('source');
-        if(str){
+        if (str) {
             listContent.innerHTML = str;
         }
         html.addEventListener('dragenter', function(e) {
@@ -464,12 +465,83 @@ MyDrag.prototype = {
             that.drop(that, e);
             return true
         }, false);
-
         that.dropTarget.classList.remove('dotted');
         that.targetBoxobj.appendChild(html);
+
+        var contentList = document.querySelectorAll('.content-menu')
+        that.creatEmptyEle(contentList);
+
+
     },
 
+    // 刷新空白位置生成空的占位div
+    creatEmptyEle: function(contentList) {
+        var i, j, len = contentList.length;
+        var partten = /\((.*?)\%/;
+        var currentLeft, currentTop, currentWidth, currentHeight; //确定当前盒子的上下左右的位置
+        var matchingLeft, matchingTop, matchingWidth, matchingHeight; //某个匹配盒子的上下左右
+        var newLeft, newTop, newWidth, newHeight; //生成虚拟盒子的坐标
+        var newArray = [];
+        var obj = {};
+        for (i = 0; i < len; i++) {
+            currentLeft = parseInt(partten.exec(contentList[i].style.left)[1]);
+            currentTop = parseInt(partten.exec(contentList[i].style.top)[1]);
+            currentWidth = parseInt(partten.exec(contentList[i].style.width)[1]);
+            currentHeight = parseInt(partten.exec(contentList[i].style.height)[1]);
 
+            for (j = 0; j < len; j++) {
+                matchingLeft = parseInt(partten.exec(contentList[j].style.left)[1]);
+                matchingTop = parseInt(partten.exec(contentList[j].style.top)[1]);
+                matchingWidth = parseInt(partten.exec(contentList[j].style.width)[1]);
+                matchingHeight = parseInt(partten.exec(contentList[j].style.height)[1]);
+                if(currentLeft > matchingLeft){ //确定在左边
+                    if(matchingTop + matchingTop > currentTop){ //确定在左上方
+                        newLeft = matchingLeft + matchingWidth;
+                        newTop = currentTop;
+                        newWidth = currentLeft - newLeft;
+                        newHeight = currentHeight - (matchingTop - currentTop);
+                        obj.newLeft = newLeft;
+                        obj.newTop = newTop;
+                        obj.newWidth = newWidth;
+                        obj.newHeight = newHeight;
+                        newArray.push(obj);
+                        obj = {};
+                    } else if(matchingTop < currentTop + currentHeight){//确定在左下方
+                        newLeft = matchingLeft + matchingWidth;
+                        newTop = matchingTop;
+                        newWidth = currentLeft - newLeft;
+                        newHeight = matchingTop - matchingHeight - currentTop;
+                        obj.newLeft = newLeft;
+                        obj.newTop = newTop;
+                        obj.newWidth = newWidth;
+                        obj.newHeight = newHeight;
+                        newArray.push(obj);
+                        obj = {};
+                    }else if (matchingTop == currentTop){//确定在正左方
+                        newLeft = matchingLeft + matchingWidth;
+                        newTop = matchingTop;
+                        newWidth = currentLeft - newLeft;
+                        if(matchingHeight > currentHeight){
+                            newHeight = currentHeight;
+                        }else if(matchingHeight < currentHeight){
+                            newHeight = matchingHeight;
+                        }else {
+                            newHeight = currentHeight;
+                        }
+
+                        obj.newLeft = newLeft;
+                        obj.newTop = newTop;
+                        obj.newWidth = newWidth;
+                        obj.newHeight = newHeight;
+                        newArray.push(obj);
+                        obj = {};
+                    }
+                }
+            }
+        }
+        console.log(newArray)
+
+    }
 
 
 

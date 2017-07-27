@@ -8,11 +8,13 @@ function MyDrag(targetBox, line, dragList, showState1, showState2, mask) {
     this.line = line; //获取生成格子线的目标元素
     this.column = 24; //X轴要分多少个格子
     this.row = 12; //Y轴要分多少个格子
-    this.calcX = 100 // column;
-    this.calcY = 100 // row;
+    this.calcXWidth = 0;
+    this.calcYHeight = 0;
     this.mask = mask; //拖拽到目标元素时的阴影盒子
     this.dropTargetLeft = 0;
     this.dropTargetTop = 0;
+    this.dropTargetWidth = 0;
+    this.dropTargetHeight = 0;
     this.eleDrag = null;
     this.dropTarget = null;
 }
@@ -28,6 +30,8 @@ MyDrag.prototype = {
         var calcX = 100 / column;
         var row = this.row;
         var calcY = 100 / row;
+        this.calcXWidth = calcX;
+        this.calcYHeight = calcY;
         var i;
         // X轴方向上的线
         for (i = 0; i < column; i++) {
@@ -109,10 +113,10 @@ MyDrag.prototype = {
     },
     dragstart: function(that) {
         var e = window.event || event;
-        var sourceId = this.dataset['sourceId'];
+        var sourceText = this.dataset['sourceText'];
 
         that.eleDrag = e.target;
-        e.dataTransfer.setData('source', sourceId);
+        e.dataTransfer.setData('source', sourceText);
     },
     dragover: function(that, obj, e) {
         var e = event || window.event;
@@ -137,94 +141,265 @@ MyDrag.prototype = {
         var partten = /\((.*?)\%/;
 
         targetLeft = parseInt(partten.exec(target.style.left)[1]);
-        targetTop =  parseInt(partten.exec(target.style.top)[1]);
-        targetWidth =  parseInt(partten.exec(target.style.width)[1]);
-        targetHeight =  parseInt(partten.exec(target.style.height)[1]);
+        targetTop = parseInt(partten.exec(target.style.top)[1]);
+        targetWidth = parseInt(partten.exec(target.style.width)[1]);
+        targetHeight = parseInt(partten.exec(target.style.height)[1]);
 
         width = parseInt(target.offsetWidth / 3);
         height = parseInt(target.offsetHeight / 3);
-
+        //TODO???判断等于三个情况时需要分成左右两个不同宽度的大小的div，或者上下不同高度的两个，分为1+2
         if (x > 0 && x < width && y > 0 && y < height) { //左上 在左邊生成div
             console.log('左上=================')
-            maskLeft = targetLeft;
-            maskTop = targetTop;
-            maskWidth = targetWidth / 2;
-            maskHeight = targetHeight;
-            that.dropTargetLeft = targetLeft + targetWidth / 2;
-            that.dropTargetTop = targetTop;
+            if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = that.calcXWidth;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = that.calcXWidth * 2;
+                that.dropTargetHeight = targetHeight;
+                that.dropTargetLeft = targetLeft + that.calcXWidth;
+                that.dropTargetTop = targetTop;
+            } else if (targetWidth <= that.calcXWidth) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            } else {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth / 2;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft + targetWidth / 2;
+                that.dropTargetTop = targetTop;
+            }
+
 
         } else if (x > 0 && x < width && y < height * 2 && y > height) { //左中 在左邊生成div
-             console.log('左中=================')
-            maskLeft = targetLeft;
-            maskTop = targetTop;
-            maskWidth = targetWidth / 2;
-            maskHeight = targetHeight;
-            that.dropTargetLeft = targetLeft + targetWidth / 2;
-            that.dropTargetTop = targetTop;
-
+            console.log('左中=================')
+            if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = that.calcXWidth;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = that.calcXWidth * 2;
+                that.dropTargetHeight = targetHeight;
+                that.dropTargetLeft = targetLeft + that.calcXWidth;
+                that.dropTargetTop = targetTop;
+            } else if (targetWidth <= that.calcXWidth) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            } else {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth / 2;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft + targetWidth / 2;
+                that.dropTargetTop = targetTop;
+            }
         } else if (x > 0 && x < width && y < height * 3 && y > height * 2) { //左下 在左邊生成div
-             console.log('左下=================')
-            maskLeft = targetLeft;
-            maskTop = targetTop;
-            maskWidth = targetWidth / 2;
-            maskHeight = targetHeight;
-            that.dropTargetLeft = targetLeft + targetWidth / 2;
-            that.dropTargetTop = targetTop;
-
+            console.log('左下=================')
+            if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = that.calcXWidth;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = that.calcXWidth * 2;
+                that.dropTargetHeight = targetHeight;
+                that.dropTargetLeft = targetLeft + that.calcXWidth;
+                that.dropTargetTop = targetTop;
+            } else if (targetWidth <= that.calcXWidth) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            } else {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth / 2;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft + targetWidth / 2;
+                that.dropTargetTop = targetTop;
+            }
         } else if (x > width && x < width * 2 && y > 0 && y < height) { //上中 div在上邊
             console.log('上中=================')
-            maskLeft = targetLeft;
-            maskTop = targetTop;
-            maskWidth = targetWidth;
-            maskHeight = targetHeight / 2;
-            that.dropTargetLeft = targetLeft;
-            that.dropTargetTop = targetTop + targetHeight / 2;
-
+            if (targetHeight <= that.calcYHeight * 3 && targetHeight > that.calcYHeight * 2) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth;
+                maskHeight = that.calcYHeight;
+                that.dropTargetWidth = targetWidth;
+                that.dropTargetHeight = that.calcYHeight * 2;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop + that.calcYHeight;
+            } else if (targetHeight <= that.calcYHeight) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            } else {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth;
+                maskHeight = targetHeight / 2;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop + targetHeight / 2;
+            }
         } else if (x > width && x < width * 2 && y > height * 2 && y < height * 3) { //下中 div在下邊
-             console.log('下中=================')
-            maskLeft = targetLeft;
-            maskTop = targetTop + targetHeight / 2;
-            maskWidth = targetWidth;
-            maskHeight = targetHeight / 2;
-            that.dropTargetLeft = targetLeft;
-            that.dropTargetTop = targetTop;
-
+            console.log('下中=================')
+            if (targetHeight <= that.calcYHeight * 3 && targetHeight > that.calcYHeight * 2) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth;
+                maskHeight = that.calcYHeight * 2;
+                that.dropTargetWidth = targetWidth;
+                that.dropTargetHeight = that.calcYHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop + that.calcYHeight;
+            } else if (targetHeight <= that.calcYHeight) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            } else {
+                maskLeft = targetLeft;
+                maskTop = targetTop + targetHeight / 2;
+                maskWidth = targetWidth;
+                maskHeight = targetHeight / 2;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            }
         } else if (x > width * 2 && x < width * 3 && y > 0 && y < height) { //右上 div在右邊
-             console.log('右上=================')
-            maskLeft = targetLeft + targetWidth / 2;
-            maskTop = targetTop;
-            maskWidth = targetWidth / 2;
-            maskHeight = targetHeight;
-            that.dropTargetLeft = targetLeft;
-            that.dropTargetTop = targetTop;
-
+            console.log('右上=================');
+            if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
+                maskLeft = targetLeft + that.calcXWidth;
+                maskTop = targetTop;
+                maskWidth = that.calcXWidth * 2;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = that.calcXWidth;
+                that.dropTargetHeight = targetHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            } else if (targetWidth <= that.calcXWidth) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            } else {
+                maskLeft = targetLeft + targetWidth / 2;
+                maskTop = targetTop;
+                maskWidth = targetWidth / 2;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            }
         } else if (x > width * 2 && x < width * 3 && y > height && y < height * 2) { //右中 div在右邊
             console.log('右中=================')
-            maskLeft = targetLeft + targetWidth / 2;
-            maskTop = targetTop;
-            maskWidth = targetWidth / 2;
-            maskHeight = targetHeight;
-            that.dropTargetLeft = targetLeft;
-            that.dropTargetTop = targetTop;
-
+            if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
+                maskLeft = targetLeft + that.calcXWidth;
+                maskTop = targetTop;
+                maskWidth = that.calcXWidth * 2;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = that.calcXWidth;
+                that.dropTargetHeight = targetHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            } else if (targetWidth <= that.calcXWidth) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            } else {
+                maskLeft = targetLeft + targetWidth / 2;
+                maskTop = targetTop;
+                maskWidth = targetWidth / 2;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            }
         } else if (x > width * 2 && x < width * 3 && y > height * 2 && y < height * 3) { //右下 div在右邊
-             console.log('右下=================')
-            maskLeft = targetLeft + targetWidth / 2;
-            maskTop = targetTop;
-            maskWidth = targetWidth / 2;
-            maskHeight = targetHeight;
-            that.dropTargetLeft = targetLeft;
-            that.dropTargetTop = targetTop;
+            console.log('右下=================')
+            if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
+                maskLeft = targetLeft + that.calcXWidth;
+                maskTop = targetTop;
+                maskWidth = that.calcXWidth * 2;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = that.calcXWidth;
+                that.dropTargetHeight = targetHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            } else if (targetWidth <= that.calcXWidth) {
+                maskLeft = targetLeft;
+                maskTop = targetTop;
+                maskWidth = targetWidth;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            } else {
+                maskLeft = targetLeft + targetWidth / 2;
+                maskTop = targetTop;
+                maskWidth = targetWidth / 2;
+                maskHeight = targetHeight;
+                that.dropTargetWidth = maskWidth;
+                that.dropTargetHeight = maskHeight;
+                that.dropTargetLeft = targetLeft;
+                that.dropTargetTop = targetTop;
+            }
         } else if (x > width && x < width * 2 && y > height && y < height * 2) { //中間 div跟target一樣大小
-             console.log('中间=================')
+            console.log('中间=================')
             maskLeft = targetLeft;
             maskTop = targetTop;
             maskWidth = targetWidth;
             maskHeight = targetHeight;
-
+            that.dropTargetWidth = maskWidth;
+            that.dropTargetHeight = maskHeight;
             that.dropTargetLeft = targetLeft;
             that.dropTargetTop = targetTop;
-
         }
 
         that.mask.classList.add('active');
@@ -251,24 +426,23 @@ MyDrag.prototype = {
         html.appendChild(header);
         html.appendChild(listContent);
 
-        // html.style.left = parseInt(target.style.left)/2 +"%";
-        // html.style.top = parseInt(target.style.top)/2 + "%";
-        // html.style.width = parseInt(target.style.width)/2 +'%';
-        // html.style.height = parseInt(target.style.height)/2+'%';
-
-        html.style.left = 'calc('+that.mask.style.left+' + 2px)';
-        html.style.top = 'calc('+that.mask.style.top+' + 2px)';
-        html.style.width = 'calc('+that.mask.style.width+' - 2px)';
-        html.style.height = 'calc('+that.mask.style.height+' - 2px)';
+        html.style.left = 'calc(' + that.mask.style.left + ' + 2px)';
+        html.style.top = 'calc(' + that.mask.style.top + ' + 2px)';
+        html.style.width = 'calc(' + that.mask.style.width + ' - 2px)';
+        html.style.height = 'calc(' + that.mask.style.height + ' - 2px)';
 
         if (target != that.targetBoxobj) {
-            target.style.top = "calc("+that.dropTargetTop + '% + 2px)';
-            target.style.left = "calc("+that.dropTargetLeft + '% + 2px)';
-            target.style.width = 'calc('+that.mask.style.width+' - 2px)';
-            target.style.height = 'calc('+that.mask.style.height+' - 2px)';
+            target.style.top = "calc(" + that.dropTargetTop + '% + 2px)';
+            target.style.left = "calc(" + that.dropTargetLeft + '% + 2px)';
+            target.style.width = 'calc(' + that.dropTargetWidth + '% - 2px)';
+            target.style.height = 'calc(' + that.dropTargetHeight + '% - 2px)';
         }
 
         html.classList.add('content-menu');
+        var str = e.dataTransfer.getData('source');
+        if(str){
+            listContent.innerHTML = str;
+        }
         html.addEventListener('dragenter', function(e) {
             that.dropTarget = this;
             this.classList.add('dotted');
@@ -276,6 +450,7 @@ MyDrag.prototype = {
 
         html.addEventListener('dragover', function(e) {
             e.preventDefault();
+            this.classList.add('dotted')
             that.dragover(that, this, e);
             return true
         }, false);
@@ -292,9 +467,8 @@ MyDrag.prototype = {
 
         that.dropTarget.classList.remove('dotted');
         that.targetBoxobj.appendChild(html);
-        // that.dropShowState();
-        // that.mask.style.display = "none";
-    }
+    },
+
 
 
 

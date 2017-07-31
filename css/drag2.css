@@ -211,3 +211,51 @@ html, body {
     color: #d9d9d9;
     font-size: 24px;
 }
+.move {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: url(../image/move_alt2.png) 0 0 no-repeat;
+    background-size: cover;
+    display: none;
+}
+.dragStart {
+    border: 2px solid #ea9518;
+}
+
+.content-menu span {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    display: block;
+    background-repeat: no-repeat;
+    -webkit-background-size: contain;
+    background-size: contain;
+    display: none;
+}
+.content-menu .top-left {
+    background-image: url(../image/top-left.png);
+    left: 0;
+    top: 0;
+    cursor: nw-resize;
+}
+.content-menu .top-right {
+    background-image: url(../image/top-right.png);
+    top: 0;
+    right: 0;
+    cursor: ne-resize;
+}
+.content-menu .bottom-right {
+    background-image: url(../image/bottom-right.png);
+    bottom: 0;
+    right: 0;
+    cursor: se-resize;
+}
+.content-menu .bottom-left {
+    background-image: url(../image/bottom-left.png);
+    bottom: 0;
+    left: 0;
+    cursor: sw-resize;
+}

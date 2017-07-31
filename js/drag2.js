@@ -420,6 +420,10 @@ MyDrag.prototype = {
             topRight = '',
             bottomLeft = '',
             bottomRight = '',
+            leftLine = '',
+            rightLine = '',
+            topLine = '',
+            bottomLine = '',
             listContent = '';
 
         that.mask.classList.remove('active');
@@ -478,6 +482,23 @@ MyDrag.prototype = {
             html.appendChild(bottomLeft);
             html.appendChild(bottomRight);
 
+            topLine = document.createElement('div');
+            topLine.classList.add('topLine');
+            bottomLine = document.createElement('div');
+            bottomLine.classList.add('bottomLine');
+
+            leftLine = document.createElement('div');
+            leftLine.classList.add('leftLine');
+            rightLine = document.createElement('div');
+            rightLine.classList.add('rightLine');
+
+            html.appendChild(leftLine);
+            html.appendChild(rightLine);
+            html.appendChild(topLine);
+            html.appendChild(bottomLine);
+
+            that.moveLeft(leftLine);
+
             header = document.createElement('div');
             listContent = document.createElement('div');
             header.classList.add('header');
@@ -522,8 +543,8 @@ MyDrag.prototype = {
             }, false);
             html.addEventListener('dragstart', function(e) {
                 // html.addEventListener('dragstart', function(ev) {
-                this.style.cursor = "move";
-                this.classList.add('dragStart');
+                // this.style.cursor = "move";
+                // this.classList.add('dragStart');
                 that.eleDrag = this;
                 that.moveContentMenuOne(that, e);
                 return true
@@ -550,7 +571,7 @@ MyDrag.prototype = {
         //     this.classList.add('dotted')
         //     that.dragover(that, this, e);
         // })
-        that.mousemoveResize('content-menu', html);
+        // that.mousemoveResize('content-menu', html);
 
         // var contentList = document.querySelectorAll('.content-menu')
         // that.creatEmptyEle(contentList);
@@ -586,11 +607,12 @@ MyDrag.prototype = {
     // },
     // 点击某个div显示拖拽状态的样式
     onClickStyle: function(clickObj) {
-        var leftTop, rightTop, leftBottom, rightBottom;
+        var leftTop, rightTop, leftBottom, rightBottom, leftLine, rightLine, topLine, bottomLine;
+        var that = this;
         clickObj.addEventListener('click', function() {
             var contentList = document.querySelectorAll('.content-menu');
             for (var i = 0; i < contentList.length; i++) {
-                contentList[i].classList.remove('dragStart');
+                // contentList[i].classList.remove('dragStart');
                 leftTop = contentList[i].querySelector('.top-left');
                 rightTop = contentList[i].querySelector('.top-right');
                 leftBottom = contentList[i].querySelector('.bottom-left');
@@ -599,6 +621,14 @@ MyDrag.prototype = {
                 rightTop.style.display = 'none';
                 leftBottom.style.display = 'none';
                 rightBottom.style.display = 'none';
+                leftLine = contentList[i].querySelector('.leftLine');
+                rightLine = contentList[i].querySelector('.rightLine');
+                topLine = contentList[i].querySelector('.topLine');
+                bottomLine = contentList[i].querySelector('.bottomLine');
+                leftLine.style.display = 'none';
+                rightLine.style.display = 'none';
+                topLine.style.display = 'none';
+                bottomLine.style.display = 'none';
             }
             leftTop = this.querySelector('.top-left');
             rightTop = this.querySelector('.top-right');
@@ -608,9 +638,91 @@ MyDrag.prototype = {
             rightTop.style.display = 'block';
             leftBottom.style.display = 'block';
             rightBottom.style.display = 'block';
-            this.classList.add('dragStart');
+            // this.classList.add('dragStart');
+            leftLine = this.querySelector('.leftLine');
+            rightLine = this.querySelector('.rightLine');
+            topLine = this.querySelector('.topLine');
+            bottomLine = this.querySelector('.bottomLine');
+            leftLine.style.display = 'block';
+            rightLine.style.display = 'block';
+            topLine.style.display = 'block';
+            bottomLine.style.display = 'block';
+            //  var partten = /\((.*?)\%/;
+            //  var ss = parseInt(partten.exec(this.style.left)[1])+parseInt(that.calcXWidth)
+            // this.style.left = 'calc('+ ss +'% + 2px)';
         })
     },
+    // 绑定向左拖拽事件
+    moveLeft: function(ele) {
+        var that = this;
+        var partten = /\((.*?)\%/;
+
+        // parseInt(partten.exec(target.style.left)[1]);
+        ele.addEventListener('mousedown', function(event) {
+            var e = event || window.event;
+            var x = parseInt(e.pageX);
+            var y = parseInt(e.pageY);
+            var left = 0;
+            var top = 0;
+            var width = 0;
+            var height = 0;
+            var source = ele.parentNode;
+            if (source) {
+                left = parseInt(partten.exec(source.style.left)[1]);
+                top = parseInt(partten.exec(source.style.top)[1]);
+                width = parseInt(partten.exec(source.style.width)[1]);
+                height = parseInt(partten.exec(source.style.height)[1]);
+            }
+
+            that.targetBoxobj.onmousemove = function(ev) {
+                var ev = ev || window.event;
+                // left = parseInt(partten.exec(source.style.left)[1]);
+                // top = parseInt(partten.exec(source.style.top)[1]);
+                // width = parseInt(partten.exec(source.style.width)[1]);
+                // height = parseInt(partten.exec(source.style.height)[1]);
+                var nowX = parseInt(ev.pageX);
+                var nowY = parseInt(ev.pageY);
+                if (nowX - x < 0) { //向左
+                    // alert('ddddd')
+                    // source.style.width = 'calc(' + (width + that.calcXWidth) + '% + 2px)';
+                    // source.style.left = 'calc(' + (left - that.calcXWidth) + '% + 2px)';
+
+                } else if (nowX - x == 0) {
+                    return
+                } else { //向右
+                    // alert('yyyyy')
+                    // source.style.left = 'calc(' + (left + that.calcXWidth) + '% + 2px)';
+                    // source.style.width = 'calc(' + (width - that.calcXWidth) + '% + 2px)';
+                }
+                // var initX = nowX - x + left;
+                // var initY = nowY - y + top;
+
+
+                // source.style.width = calc(parseInt(partten.exec(source.style.widht)[1])+that.calcX +'%'-2px);
+                // source.style.top = initY + 'px';
+            }
+        }, true);
+        that.targetBoxobj.addEventListener('mouseup', function() {
+            source.style.left = 'calc(' + (left + that.calcXWidth) + '% + 2px)';
+            source.style.width = 'calc(' + (width - that.calcXWidth) + '% + 2px)';
+            that.targetBoxobj.onmousemove = null;
+        });
+
+    },
+    // 判断拖拉的方向
+    getDirection: function(el) {
+        var xPos, yPos, offset, dir;
+        dir = "";
+        xPos = window.event.offsetX;
+        yPos = window.event.offsetY;
+        offset = 8; //设置边缘距离
+        if (yPos < offset) dir += "n";
+        else if (yPos > el.offsetHeight - offset) dir += "s";
+        if (xPos < offset) dir += "w";
+        else if (xPos > el.offsetWidth - offset) dir += "e";
+        return dir;
+    },
+    //
     // mousemoveResize: function(resizeObj, eleHtml) {
     //     var that = this;
     //     var temp = null;
@@ -645,28 +757,28 @@ MyDrag.prototype = {
     //         //     var header = eleHtml.querySelector('.header')
     //         //     that.MoveContorl(header, eleHtml)
     //         // } else {
-    //             if (event.srcElement.className != 'content-menu') {
-    //                 return
-    //             }
-    //             var el = getReal(event.srcElement, "className", resizeObj);
-    //             if (el == null) {
-    //                 theobject = null;
-    //                 return;
-    //             }
-    //             that.dir = getDirection(el);
-    //             if (that.dir == "") return;
-    //             theobject = new resizeObject();
+    //         if (event.srcElement.className != 'content-menu') {
+    //             return
+    //         }
+    //         var el = getReal(event.srcElement, "className", resizeObj);
+    //         if (el == null) {
+    //             theobject = null;
+    //             return;
+    //         }
+    //         that.dir = getDirection(el);
+    //         if (that.dir == "") return;
+    //         theobject = new resizeObject();
 
-    //             theobject.el = el;
-    //             theobject.dir = that.dir;
-    //             theobject.grabx = window.event.clientX;
-    //             theobject.graby = window.event.clientY;
-    //             theobject.width = el.offsetWidth;
-    //             theobject.height = el.offsetHeight;
-    //             theobject.left = el.offsetLeft;
-    //             theobject.top = el.offsetTop;
-    //             window.event.returnValue = false;
-    //             window.event.cancelBubble = true;
+    //         theobject.el = el;
+    //         theobject.dir = that.dir;
+    //         theobject.grabx = window.event.clientX;
+    //         theobject.graby = window.event.clientY;
+    //         theobject.width = el.offsetWidth;
+    //         theobject.height = el.offsetHeight;
+    //         theobject.left = el.offsetLeft;
+    //         theobject.top = el.offsetTop;
+    //         window.event.returnValue = false;
+    //         window.event.cancelBubble = true;
     //         // }
 
     //     }

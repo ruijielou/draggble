@@ -263,15 +263,17 @@ html, body {
     position: absolute;
     width: 2px;
     height: 100%;
-    background: #ea9518;
+    background: transparent;
     display: none;
+    padding: 10px;
 }
 .topLine, .bottomLine  {
     position: absolute;
     width: 100%;
     height: 2px;
-    background: #ea9518;
+    background: transparent;
     display: none;
+    padding: 10px;
 }
 .leftLine, .topLine {
     left: 0;

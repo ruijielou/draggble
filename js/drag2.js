@@ -544,7 +544,8 @@ MyDrag.prototype = {
             html.addEventListener('dragstart', function(e) {
                 // html.addEventListener('dragstart', function(ev) {
                 // this.style.cursor = "move";
-                // this.classList.add('dragStart');
+                this.classList.add('dragStart');
+                // console.log('htmldragstart')
                 that.eleDrag = this;
                 that.moveContentMenuOne(that, e);
                 return true
@@ -612,7 +613,7 @@ MyDrag.prototype = {
         clickObj.addEventListener('click', function() {
             var contentList = document.querySelectorAll('.content-menu');
             for (var i = 0; i < contentList.length; i++) {
-                // contentList[i].classList.remove('dragStart');
+                contentList[i].classList.remove('dragStart');
                 leftTop = contentList[i].querySelector('.top-left');
                 rightTop = contentList[i].querySelector('.top-right');
                 leftBottom = contentList[i].querySelector('.bottom-left');
@@ -638,7 +639,7 @@ MyDrag.prototype = {
             rightTop.style.display = 'block';
             leftBottom.style.display = 'block';
             rightBottom.style.display = 'block';
-            // this.classList.add('dragStart');
+            this.classList.add('dragStart');
             leftLine = this.querySelector('.leftLine');
             rightLine = this.querySelector('.rightLine');
             topLine = this.querySelector('.topLine');
@@ -674,25 +675,25 @@ MyDrag.prototype = {
                 height = parseInt(partten.exec(source.style.height)[1]);
             }
 
-            that.targetBoxobj.onmousemove = function(ev) {
+            document.onmousemove = function(ev) {
                 var ev = ev || window.event;
-                // left = parseInt(partten.exec(source.style.left)[1]);
-                // top = parseInt(partten.exec(source.style.top)[1]);
-                // width = parseInt(partten.exec(source.style.width)[1]);
-                // height = parseInt(partten.exec(source.style.height)[1]);
+                left = parseInt(partten.exec(source.style.left)[1]);
+                top = parseInt(partten.exec(source.style.top)[1]);
+                width = parseInt(partten.exec(source.style.width)[1]);
+                height = parseInt(partten.exec(source.style.height)[1]);
                 var nowX = parseInt(ev.pageX);
                 var nowY = parseInt(ev.pageY);
                 if (nowX - x < 0) { //向左
                     // alert('ddddd')
-                    // source.style.width = 'calc(' + (width + that.calcXWidth) + '% + 2px)';
-                    // source.style.left = 'calc(' + (left - that.calcXWidth) + '% + 2px)';
+                    source.style.width = 'calc(' + (width + that.calcXWidth) + '% + 2px)';
+                    source.style.left = 'calc(' + (left - that.calcXWidth) + '% + 2px)';
 
                 } else if (nowX - x == 0) {
                     return
                 } else { //向右
                     // alert('yyyyy')
-                    // source.style.left = 'calc(' + (left + that.calcXWidth) + '% + 2px)';
-                    // source.style.width = 'calc(' + (width - that.calcXWidth) + '% + 2px)';
+                    source.style.left = 'calc(' + (left + that.calcXWidth) + '% + 2px)';
+                    source.style.width = 'calc(' + (width - that.calcXWidth) + '% + 2px)';
                 }
                 // var initX = nowX - x + left;
                 // var initY = nowY - y + top;
@@ -702,10 +703,12 @@ MyDrag.prototype = {
                 // source.style.top = initY + 'px';
             }
         }, true);
-        that.targetBoxobj.addEventListener('mouseup', function() {
-            source.style.left = 'calc(' + (left + that.calcXWidth) + '% + 2px)';
-            source.style.width = 'calc(' + (width - that.calcXWidth) + '% + 2px)';
-            that.targetBoxobj.onmousemove = null;
+        document.addEventListener('mouseup', function() {
+            // source.style.left = 'calc(' + (left + that.calcXWidth) + '% + 2px)';
+            // source.style.width = 'calc(' + (width - that.calcXWidth) + '% + 2px)';
+            // that.targetBoxobj.onmousemove = null;
+            document.onmousemove=null;
+                document.onmouseup=null;
         });
 
     },

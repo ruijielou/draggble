@@ -125,12 +125,12 @@ MyDrag.prototype = {
 
         });
         this.showState2.addEventListener('dragleave', function(e) {
-          var mask = document.querySelectorAll('.mask');
-          console.log(mask);
+            var mask = document.querySelectorAll('.mask');
+            console.log(mask);
 
-          for(var i = 0; i<mask.length; i++){
-            mask[i].parentNode.removeChild(mask[i]);
-          }
+            for (var i = 0; i < mask.length; i++) {
+                mask[i].parentNode.removeChild(mask[i]);
+            }
 
         });
 
@@ -146,7 +146,7 @@ MyDrag.prototype = {
 
     dragover: function(that, obj, e) {
         var mask = document.querySelectorAll('.mask');
-        if(mask.length == 0 ){
+        if (mask.length == 0) {
             this.dragenter(obj);
         }
         var e = event || window.event;
@@ -450,7 +450,7 @@ MyDrag.prototype = {
         that.creatMask.style.height = maskHeight + '%';
     },
     // 拖拽经过目标元素时的事件
-    dragenter: function(obj){
+    dragenter: function(obj) {
         // 1、添加mask遮罩层，并且添加到当前目标元素的父元素中
         // var creatMask = this.creatMask
         this.creatMask = document.createElement('div');
@@ -602,11 +602,11 @@ MyDrag.prototype = {
             }
         }
         var mask = document.querySelectorAll('.mask');
-          console.log(mask);
+        console.log(mask);
 
-          for(var i = 0; i<mask.length; i++){
+        for (var i = 0; i < mask.length; i++) {
             mask[i].parentNode.removeChild(mask[i]);
-          }
+        }
     },
     // 添加事件模式
     addEvent: function(html) {
@@ -628,11 +628,11 @@ MyDrag.prototype = {
 
         html.addEventListener('dragleave', function(e) {
             var mask = document.querySelectorAll('.mask');
-          // console.log(mask);
+            // console.log(mask);
 
-          for(var i = 0; i<mask.length; i++){
-            mask[i].parentNode.removeChild(mask[i]);
-          }
+            for (var i = 0; i < mask.length; i++) {
+                mask[i].parentNode.removeChild(mask[i]);
+            }
             // this.classList.remove('dotted')
             return true
         }, false);
@@ -709,7 +709,7 @@ MyDrag.prototype = {
         html.appendChild(topLine);
         html.appendChild(bottomLine);
 
-        // that.moveLeft(leftLine);
+        that.moveLeft(leftLine);
 
         header = document.createElement('div');
         listContent = document.createElement('div');
@@ -847,7 +847,7 @@ MyDrag.prototype = {
     moveLeft: function(ele) {
         var that = this;
         var partten = /\((.*?)\%/;
-
+        // parseInt(partten.exec(target.style.left)[1]);
         ele.addEventListener('mousedown', function(event) {
             var e = event || window.event;
             var x = parseInt(e.pageX);
@@ -857,6 +857,8 @@ MyDrag.prototype = {
             var width = 0;
             var height = 0;
             var source = ele.parentNode;
+            var parentBoxWidth = document.body.clientWidth - 200;
+            var lastX = 0;
             if (source) {
                 left = parseInt(partten.exec(source.style.left)[1]);
                 top = parseInt(partten.exec(source.style.top)[1]);
@@ -866,24 +868,34 @@ MyDrag.prototype = {
 
             document.onmousemove = function(ev) {
                 var ev = ev || window.event;
-                left = parseInt(partten.exec(source.style.left)[1]);
-                top = parseInt(partten.exec(source.style.top)[1]);
-                width = parseInt(partten.exec(source.style.width)[1]);
-                height = parseInt(partten.exec(source.style.height)[1]);
+                left = Number(Number(partten.exec(source.style.left)[1]).toFixed(4));
+                top = Number(Number(partten.exec(source.style.top)[1]).toFixed(4));
+                width = Number(Number(partten.exec(source.style.width)[1]).toFixed(4));
+                height = Number(Number(partten.exec(source.style.height)[1]).toFixed(4));
+
                 var nowX = parseInt(ev.pageX);
                 var nowY = parseInt(ev.pageY);
+
+                var calcXs = Number((((nowX - x) / parentBoxWidth) - lastX).toFixed(4));
+                //console.log(calcXs+'calcXs');
+                //console.log(width);
+
                 if (nowX - x < 0) { //向左
                     // alert('ddddd')
-                    source.style.width = 'calc(' + (width + that.calcXWidth) + '% + 2px)';
-                    source.style.left = 'calc(' + (left - that.calcXWidth) + '% + 2px)';
+                    source.style.width = 'calc(' + (width - calcXs) + '%)';
+                    source.style.left = 'calc(' + (left + calcXs) + '%)';
 
                 } else if (nowX - x == 0) {
                     return
-                } else { //向右
+                } else if (nowX - x > 0) { //向右
                     // alert('yyyyy')
-                    source.style.left = 'calc(' + (left + that.calcXWidth) + '% + 2px)';
-                    source.style.width = 'calc(' + (width - that.calcXWidth) + '% + 2px)';
+                    source.style.left = 'calc(' + (left + calcXs) + '%)';
+                    source.style.width = 'calc(' + (width - calcXs) + '%)';
+                    // console.log(left+'left');
+                    // console.log(calcXs+'calcXs');
+                    // console.log((left + calcXs) +'left+calcXs');
                 }
+                lastX = calcXs;
                 // var initX = nowX - x + left;
                 // var initY = nowY - y + top;
 
@@ -892,14 +904,14 @@ MyDrag.prototype = {
                 // source.style.top = initY + 'px';
             }
         }, true);
-        document.addEventListener('mouseup', function() {
+
+         document.addEventListener('mouseup', function() {
             // source.style.left = 'calc(' + (left + that.calcXWidth) + '% + 2px)';
             // source.style.width = 'calc(' + (width - that.calcXWidth) + '% + 2px)';
             // that.targetBoxobj.onmousemove = null;
-            document.onmousemove = null;
-            document.onmouseup = null;
+            document.onmousemove=null;
+                document.onmouseup=null;
         });
-
     },
     // 判断拖拉的方向
     getDirection: function(el) {

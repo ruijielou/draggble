@@ -145,6 +145,10 @@ MyDrag.prototype = {
     },
 
     dragover: function(that, obj, e) {
+        var mask = document.querySelectorAll('.mask');
+        if(mask.length == 0 ){
+            this.dragenter(obj);
+        }
         var e = event || window.event;
         var maskLeft = 0;
         var maskTop = 0;
@@ -178,6 +182,7 @@ MyDrag.prototype = {
             // console.log('左上=================')
             that.dragDir = 'left';
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
+
                 maskLeft = targetLeft;
                 maskTop = targetTop;
                 maskWidth = that.calcXWidth;
@@ -186,7 +191,9 @@ MyDrag.prototype = {
                 that.dropTargetHeight = targetHeight;
                 that.dropTargetLeft = targetLeft + that.calcXWidth;
                 that.dropTargetTop = targetTop;
+
             } else if (targetWidth <= that.calcXWidth) {
+
                 maskLeft = targetLeft;
                 maskTop = targetTop;
                 maskWidth = targetWidth;
@@ -195,7 +202,9 @@ MyDrag.prototype = {
                 that.dropTargetHeight = maskHeight;
                 that.dropTargetLeft = targetLeft;
                 that.dropTargetTop = targetTop;
+
             } else {
+
                 maskLeft = targetLeft;
                 maskTop = targetTop;
                 maskWidth = targetWidth / 2;
@@ -204,6 +213,7 @@ MyDrag.prototype = {
                 that.dropTargetHeight = maskHeight;
                 that.dropTargetLeft = targetLeft + targetWidth / 2;
                 that.dropTargetTop = targetTop;
+
             }
         } else if (x > 0 && x < width && y < height * 2 && y > height) { //左中 在左邊生成div
             that.dragDir = 'left';
@@ -449,8 +459,8 @@ MyDrag.prototype = {
         // 2、获取目标元素的父元素
         var targetParent = obj.parentNode;
         targetParent.appendChild(this.creatMask);
-
     },
+
     drop: function(that, e) {
 
         var content = document.querySelectorAll('.content-menu');

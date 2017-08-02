@@ -18,6 +18,10 @@ function MyDrag(targetBox, line, dragList, showState1, showState2, mask) {
     this.eleDrag = null;
     this.dropTarget = null;
     this.dragDir = '';
+    this.parentTop = 0;
+    this.parentLeft = 0;
+    this.parentHeight = 0;
+    this.parentWidth = 0;
 }
 MyDrag.prototype = {
     init: function() {
@@ -156,6 +160,7 @@ MyDrag.prototype = {
         //TODO???判断等于三个情况时需要分成左右两个不同宽度的大小的div，或者上下不同高度的两个，分为1+2
         if (x > 0 && x < width && y > 0 && y < height) { //左上 在左邊生成div
             // console.log('左上=================')
+            that.dragDir = 'left';
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft;
                 maskTop = targetTop;
@@ -185,7 +190,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > 0 && x < width && y < height * 2 && y > height) { //左中 在左邊生成div
-            // console.log('左中=================')
+            that.dragDir = 'left';
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft;
                 maskTop = targetTop;
@@ -215,7 +220,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > 0 && x < width && y < height * 3 && y > height * 2) { //左下 在左邊生成div
-            // console.log('左下=================')
+            that.dragDir = 'left';
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft;
                 maskTop = targetTop;
@@ -245,6 +250,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > width && x < width * 2 && y > 0 && y < height) { //上中 div在上邊
+            that.dragDir = 'top';
             // console.log('上中=================')
             if (targetHeight <= that.calcYHeight * 3 && targetHeight > that.calcYHeight * 2) {
                 maskLeft = targetLeft;
@@ -275,6 +281,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop + targetHeight / 2;
             }
         } else if (x > width && x < width * 2 && y > height * 2 && y < height * 3) { //下中 div在下邊
+            that.dragDir = 'bottom';
             // console.log('下中=================')
             if (targetHeight <= that.calcYHeight * 3 && targetHeight > that.calcYHeight * 2) {
                 maskLeft = targetLeft;
@@ -305,6 +312,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > width * 2 && x < width * 3 && y > 0 && y < height) { //右上 div在右邊
+            that.dragDir = 'right';
             // console.log('右上=================');
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft + that.calcXWidth;
@@ -335,6 +343,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > width * 2 && x < width * 3 && y > height && y < height * 2) { //右中 div在右邊
+            that.dragDir = 'right';
             // console.log('右中=================')
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft + that.calcXWidth;
@@ -365,6 +374,7 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > width * 2 && x < width * 3 && y > height * 2 && y < height * 3) { //右下 div在右邊
+            that.dragDir = 'right';
             // console.log('右下=================')
             if (targetWidth <= that.calcXWidth * 3 && targetWidth > that.calcXWidth * 2) {
                 maskLeft = targetLeft + that.calcXWidth;
@@ -395,7 +405,8 @@ MyDrag.prototype = {
                 that.dropTargetTop = targetTop;
             }
         } else if (x > width && x < width * 2 && y > height && y < height * 2) { //中間 div跟target一樣大小
-            // console.log('中间=================')
+
+            that.dragDir = 'middle';
             maskLeft = targetLeft;
             maskTop = targetTop;
             maskWidth = targetWidth;
@@ -555,7 +566,9 @@ MyDrag.prototype = {
     },
     drop: function(that, e) {
         var parents = document.querySelectorAll('.parentNodes');
-        console.log(parents)
+
+        console.log(parents);
+
         var parentNodes = '',
             html = '',
             placeHtml = '',
@@ -594,7 +607,7 @@ MyDrag.prototype = {
             this.targetBoxobj.appendChild(parentNodes);
             this.addEvent(placeHtml);
 
-        }else {
+        } else {
 
             parentNodes = document.createElement('div');
             parentNodes.classList.add('parentList');
@@ -611,6 +624,11 @@ MyDrag.prototype = {
             this.addEvent(html);
 
             var target = that.dropTarget;
+            that.parentTop = target.style.top;
+            that.parentLeft = target.style.left;
+            that.parentHeight = target.style.height;
+            that.parentWidth = target.style.width;
+
             console.log(target);
             target.style.top = "calc(" + that.dropTargetTop + '% + 2px)';
             target.style.left = "calc(" + that.dropTargetLeft + '% + 2px)';
@@ -618,6 +636,11 @@ MyDrag.prototype = {
             target.style.height = 'calc(' + that.dropTargetHeight + '% - 2px)';
 
             parentNodes.appendChild(html);
+            parentNodes.style.top = that.parentTop;
+            parentNodes.style.left = that.parentLeft;
+            parentNodes.style.height = that.parentHeight;
+            parentNodes.style.width = that.parentWidth;
+
             var otherTarget = target;
             var targetParent = target.parentNode;
             targetParent.removeChild(target);

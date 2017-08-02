@@ -313,6 +313,7 @@ body {
     background: rgba(0, 0, 0, .5);
 }
 .parentList {
-    /*// position: absolute;*/
-    background: pink;
+    position: absolute;
+    background: rgba(204, 0, 204, .5);
+    z-index: 0;
 }

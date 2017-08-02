@@ -567,7 +567,7 @@ MyDrag.prototype = {
     drop: function(that, e) {
         var parents = document.querySelectorAll('.parentNodes');
 
-        console.log(parents);
+        // console.log(parents);
 
         var parentNodes = '',
             html = '',
@@ -617,35 +617,103 @@ MyDrag.prototype = {
             } else {
                 html = this.creatHtml();
             }
-            html.style.left = 'calc(' + that.mask.style.left + ' + 2px)';
-            html.style.top = 'calc(' + that.mask.style.top + ' + 2px)';
-            html.style.width = 'calc(' + that.mask.style.width + ' - 2px)';
-            html.style.height = 'calc(' + that.mask.style.height + ' - 2px)';
-            this.addEvent(html);
-
-            var target = that.dropTarget;
+             var target = that.dropTarget;
             that.parentTop = target.style.top;
             that.parentLeft = target.style.left;
             that.parentHeight = target.style.height;
             that.parentWidth = target.style.width;
 
-            console.log(target);
-            target.style.top = "calc(" + that.dropTargetTop + '% + 2px)';
-            target.style.left = "calc(" + that.dropTargetLeft + '% + 2px)';
-            target.style.width = 'calc(' + that.dropTargetWidth + '% - 2px)';
-            target.style.height = 'calc(' + that.dropTargetHeight + '% - 2px)';
+            // console.log(target);
+            if(that.dragDir == 'left'){
 
-            parentNodes.appendChild(html);
-            parentNodes.style.top = that.parentTop;
-            parentNodes.style.left = that.parentLeft;
-            parentNodes.style.height = that.parentHeight;
-            parentNodes.style.width = that.parentWidth;
+                html.style.left = 'calc(0% + 2px)';
+                html.style.top = 'calc(0% + 2px)';
+                html.style.width = 'calc(50% - 2px)';
+                html.style.height = 'calc(100% - 2px)';
 
-            var otherTarget = target;
-            var targetParent = target.parentNode;
-            targetParent.removeChild(target);
-            parentNodes.appendChild(otherTarget);
-            targetParent.appendChild(parentNodes);
+                target.style.top = 'calc(0% + 2px)';
+                target.style.left = 'calc(50% + 2px)';
+                target.style.width = 'calc(50% - 2px)';
+                target.style.height = 'calc(100% - 2px)';
+
+            }else if(that.dragDir == 'right') {
+
+                html.style.left = 'calc(50% + 2px)';
+                html.style.top = 'calc(0% + 2px)';
+                html.style.width = 'calc(50% - 2px)';
+                html.style.height = 'calc(100% - 2px)';
+
+                target.style.top = 'calc(0% + 2px)';
+                target.style.left = 'calc(0% + 2px)';
+                target.style.width = 'calc(50% - 2px)';
+                target.style.height = 'calc(100% - 2px)';
+
+            }else if(that.dragDir == 'top') {
+
+                html.style.left = 'calc(0% + 2px)';
+                html.style.top = 'calc(0% + 2px)';
+                html.style.width = 'calc(100% - 2px)';
+                html.style.height = 'calc(50% - 2px)';
+
+                target.style.top = 'calc(50% + 2px)';
+                target.style.left = 'calc(0% + 2px)';
+                target.style.width = 'calc(100% - 2px)';
+                target.style.height = 'calc(50% - 2px)';
+
+            }else if(that.dragDir == 'bottom') {
+
+                html.style.left = 'calc(0% + 2px)';
+                html.style.top = 'calc(50% + 2px)';
+                html.style.width = 'calc(100% - 2px)';
+                html.style.height = 'calc(50% - 2px)';
+
+                target.style.top = 'calc(0% + 2px)';
+                target.style.left = 'calc(0% + 2px)';
+                target.style.width = 'calc(100% - 2px)';
+                target.style.height = 'calc(50% - 2px)';
+            }else if(that.dragDir == 'middle') {
+                html.style.left = target.style.left;
+                html.style.top = target.style.top;
+                html.style.width = target.style.width;
+                html.style.height = target.style.height;
+
+                // target.style.top = 'calc(0% + 2px)';
+                // target.style.left = 'calc(0% + 2px)';
+                // target.style.width = 'calc(100% - 2px)';
+                // target.style.height = 'calc(50% - 2px)';
+            }
+            // html.style.left = 'calc(' + that.mask.style.left + ' + 2px)';
+            // html.style.top = 'calc(' + that.mask.style.top + ' + 2px)';
+            // html.style.width = 'calc(' + that.mask.style.width + ' - 2px)';
+            // html.style.height = 'calc(' + that.mask.style.height + ' - 2px)';
+            this.addEvent(html);
+            // this.addEvent(target);
+
+
+
+            // target.style.top = "calc(" + that.dropTargetTop + '% + 2px)';
+            // target.style.left = "calc(" + that.dropTargetLeft + '% + 2px)';
+            // target.style.width = 'calc(' + that.dropTargetWidth + '% - 2px)';
+            // target.style.height = 'calc(' + that.dropTargetHeight + '% - 2px)';
+            if(that.dragDir !== 'middle'){
+                parentNodes.appendChild(html);
+                parentNodes.style.top = that.parentTop;
+                parentNodes.style.left = that.parentLeft;
+                parentNodes.style.height = that.parentHeight;
+                parentNodes.style.width = that.parentWidth;
+                var otherTarget = target;
+                var targetParent = target.parentNode;
+                targetParent.removeChild(target);
+                parentNodes.appendChild(otherTarget);
+                targetParent.appendChild(parentNodes);
+
+            }else {
+                var otherTarget = target;
+                var targetParent = target.parentNode;
+                targetParent.removeChild(target);
+                // parentNodes.appendChild(otherTarget);
+                targetParent.appendChild(html);
+            }
         }
 
 
@@ -927,7 +995,32 @@ MyDrag.prototype = {
         return html;
     },
     deleteContent: function(obj) {
-        obj.parentNode.parentNode.removeChild(obj.parentNode);
+        // 删除的时候先获取一下当前删除的父级的内容
+        // 保存一下那个没删除的图形
+        // 删除掉当前的那个
+        // 把保存的那个添加到删除的父级的父级里
+        // 把父级给删除掉
+        //
+        //1. 获取父级里的所有内容
+        var copyEle = obj.parentNode.parentNode;
+        // 2. 获取最后追加的上一层的父级
+        var lastParent = copyEle.parentNode;
+        console.log(copyEle);
+        console.log(lastParent);
+
+        var saveEle = null;
+        for(var i = 0; i<copyEle.length; i++){
+            if(copyEle[i] == obj.parentNode){
+                obj.parentNode.parentNode.removeChild(obj.parentNode);
+            }
+            if(copyEle[i] !== obj.parentNode) {
+                saveEle = copyEle[i];
+            }
+        }
+        // obj.parentNode.parentNode.parentNode.appendChild(saveEle);
+        // obj.parentNode.parentNode.parentNode.removeChild(obj.parentNode.parentNode);
+
+        // obj.parentNode.parentNode.removeChild(obj.parentNode);
     },
     moveContentMenuOne: function(that, e) {
         // console.log(e)
@@ -1265,7 +1358,7 @@ MyDrag.prototype = {
                 }
             }
         }
-        console.log(newArray)
+        // console.log(newArray)
 
     }
 

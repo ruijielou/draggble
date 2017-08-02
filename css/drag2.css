@@ -239,25 +239,25 @@ body {
     display: none;
 }
 .content-menu .top-left {
-    background-image: url(../image/top-left.png);
+    /*background-image: url(../image/top-left.png);*/
     left: 0;
     top: 0;
     cursor: nw-resize;
 }
 .content-menu .top-right {
-    background-image: url(../image/top-right.png);
+    /*background-image: url(../image/top-right.png);*/
     top: 0;
     right: 0;
     cursor: ne-resize;
 }
 .content-menu .bottom-right {
-    background-image: url(../image/bottom-right.png);
+    /*background-image: url(../image/bottom-right.png);*/
     bottom: 0;
     right: 0;
     cursor: se-resize;
 }
 .content-menu .bottom-left {
-    background-image: url(../image/bottom-left.png);
+    /*// background-image: url(../image/bottom-left.png);*/
     bottom: 0;
     left: 0;
     cursor: sw-resize;
@@ -299,7 +299,7 @@ body {
 }
 .delete {
     position: absolute;
-    right: -25px;
+    right: 0;
     width: 20px;
     height: 20px;
     background: url(../image/delete.png) no-repeat;
@@ -307,6 +307,7 @@ body {
     background-size: contain;
     cursor: pointer;
     display: none;
+    z-index: 999;
 }
 .parentNodes {
     position: absolute;
@@ -315,5 +316,5 @@ body {
 .parentList {
     position: absolute;
     background: rgba(204, 0, 204, .5);
-    z-index: 0;
+    z-index: 5;
 }

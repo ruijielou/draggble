@@ -565,7 +565,7 @@ MyDrag.prototype = {
         that.mask.style.height = maskHeight + '%';
     },
     drop: function(that, e) {
-        var parents = document.querySelectorAll('.parentNodes');
+        var content = document.querySelectorAll('.content-menu');
 
         // console.log(parents);
 
@@ -573,21 +573,21 @@ MyDrag.prototype = {
             html = '',
             placeHtml = '',
             str = e.dataTransfer.getData('source');
-
+        if (str != "") {
+            html = this.creatHtml(str);
+        } else {
+            html = this.creatHtml();
+        }
         // 如果当前是空白的第一次拖过来的内容
         // 需要生成一个最父级，和右边空白区域的容器
-        if (parents.length == 0) {
+        if (content.length == 0 && that.dragDir !== 'middle') {
             // 创建一个父级容器
             parentNodes = document.createElement('div');
-            parentNodes.classList.add('parentNodes');
+            parentNodes.classList.add('parentList');
             parentNodes.style.width = 'calc(100%)';
             parentNodes.style.height = 'calc(100%)';
             // 创建图形
-            if (str != "") {
-                html = this.creatHtml(str);
-            } else {
-                html = this.creatHtml();
-            }
+
             html.style.left = 'calc(' + that.mask.style.left + ' + 2px)';
             html.style.top = 'calc(' + that.mask.style.top + ' + 2px)';
             html.style.width = 'calc(' + that.mask.style.width + ' - 2px)';
@@ -607,24 +607,33 @@ MyDrag.prototype = {
             this.targetBoxobj.appendChild(parentNodes);
             this.addEvent(placeHtml);
 
+        } else if (content.length == 0 && that.dragDir == 'middle') {
+
+            html.style.left = 'calc(' + that.mask.style.left + ' + 2px)';
+            html.style.top = 'calc(' + that.mask.style.top + ' + 2px)';
+            html.style.width = 'calc(' + that.mask.style.width + ' - 2px)';
+            html.style.height = 'calc(' + that.mask.style.height + ' - 2px)';
+            this.addEvent(html);
+            this.targetBoxobj.appendChild(html);
+
         } else {
 
             parentNodes = document.createElement('div');
             parentNodes.classList.add('parentList');
 
-            if (str != "") {
-                html = this.creatHtml(str);
-            } else {
-                html = this.creatHtml();
-            }
-             var target = that.dropTarget;
+            // if (str != "") {
+            //     html = this.creatHtml(str);
+            // } else {
+            //     html = this.creatHtml();
+            // }
+            var target = that.dropTarget;
             that.parentTop = target.style.top;
             that.parentLeft = target.style.left;
             that.parentHeight = target.style.height;
             that.parentWidth = target.style.width;
 
             // console.log(target);
-            if(that.dragDir == 'left'){
+            if (that.dragDir == 'left') {
 
                 html.style.left = 'calc(0% + 2px)';
                 html.style.top = 'calc(0% + 2px)';
@@ -636,7 +645,7 @@ MyDrag.prototype = {
                 target.style.width = 'calc(50% - 2px)';
                 target.style.height = 'calc(100% - 2px)';
 
-            }else if(that.dragDir == 'right') {
+            } else if (that.dragDir == 'right') {
 
                 html.style.left = 'calc(50% + 2px)';
                 html.style.top = 'calc(0% + 2px)';
@@ -648,7 +657,7 @@ MyDrag.prototype = {
                 target.style.width = 'calc(50% - 2px)';
                 target.style.height = 'calc(100% - 2px)';
 
-            }else if(that.dragDir == 'top') {
+            } else if (that.dragDir == 'top') {
 
                 html.style.left = 'calc(0% + 2px)';
                 html.style.top = 'calc(0% + 2px)';
@@ -660,7 +669,7 @@ MyDrag.prototype = {
                 target.style.width = 'calc(100% - 2px)';
                 target.style.height = 'calc(50% - 2px)';
 
-            }else if(that.dragDir == 'bottom') {
+            } else if (that.dragDir == 'bottom') {
 
                 html.style.left = 'calc(0% + 2px)';
                 html.style.top = 'calc(50% + 2px)';
@@ -671,31 +680,17 @@ MyDrag.prototype = {
                 target.style.left = 'calc(0% + 2px)';
                 target.style.width = 'calc(100% - 2px)';
                 target.style.height = 'calc(50% - 2px)';
-            }else if(that.dragDir == 'middle') {
+            } else if (that.dragDir == 'middle') {
                 html.style.left = target.style.left;
                 html.style.top = target.style.top;
                 html.style.width = target.style.width;
                 html.style.height = target.style.height;
 
-                // target.style.top = 'calc(0% + 2px)';
-                // target.style.left = 'calc(0% + 2px)';
-                // target.style.width = 'calc(100% - 2px)';
-                // target.style.height = 'calc(50% - 2px)';
             }
-            // html.style.left = 'calc(' + that.mask.style.left + ' + 2px)';
-            // html.style.top = 'calc(' + that.mask.style.top + ' + 2px)';
-            // html.style.width = 'calc(' + that.mask.style.width + ' - 2px)';
-            // html.style.height = 'calc(' + that.mask.style.height + ' - 2px)';
+
             this.addEvent(html);
-            // this.addEvent(target);
 
-
-
-            // target.style.top = "calc(" + that.dropTargetTop + '% + 2px)';
-            // target.style.left = "calc(" + that.dropTargetLeft + '% + 2px)';
-            // target.style.width = 'calc(' + that.dropTargetWidth + '% - 2px)';
-            // target.style.height = 'calc(' + that.dropTargetHeight + '% - 2px)';
-            if(that.dragDir !== 'middle'){
+            if (that.dragDir !== 'middle') {
                 parentNodes.appendChild(html);
                 parentNodes.style.top = that.parentTop;
                 parentNodes.style.left = that.parentLeft;
@@ -707,7 +702,7 @@ MyDrag.prototype = {
                 parentNodes.appendChild(otherTarget);
                 targetParent.appendChild(parentNodes);
 
-            }else {
+            } else {
                 var otherTarget = target;
                 var targetParent = target.parentNode;
                 targetParent.removeChild(target);
@@ -1002,25 +997,45 @@ MyDrag.prototype = {
         // 把父级给删除掉
         //
         //1. 获取父级里的所有内容
-        var copyEle = obj.parentNode.parentNode;
+        var copyEle = obj.parentNode.parentNode.childNodes;
+        // 获取父级
+        var prevParent = obj.parentNode.parentNode;
+        var prevParentTop = prevParent.style.top;
+        var prevParentLeft = prevParent.style.left;
+        var prevParentWidth = prevParent.style.width;
+        var prevParentHeight = prevParent.style.height;
         // 2. 获取最后追加的上一层的父级
-        var lastParent = copyEle.parentNode;
+        var lastParent = obj.parentNode.parentNode.parentNode;
+        // 3.判断一下最外层如果只有一个的话就不删除父级
+
         console.log(copyEle);
         console.log(lastParent);
-
+        console.log(prevParent);
+        var right = document.querySelector('.right');
+        if (lastParent == right || prevParent == this.targetBoxobj) {
+            obj.parentNode.parentNode.removeChild(obj.parentNode);
+            this.showState();
+            return;
+        }
         var saveEle = null;
-        for(var i = 0; i<copyEle.length; i++){
-            if(copyEle[i] == obj.parentNode){
-                obj.parentNode.parentNode.removeChild(obj.parentNode);
-            }
-            if(copyEle[i] !== obj.parentNode) {
+        var deleteEle = null;
+        var i, len = copyEle.length;
+        for (i = 0; i < len; i++) {
+            if (copyEle[i] == obj.parentNode) {
+                deleteEle = copyEle[i];
+            } else if (copyEle[i] !== obj.parentNode) {
                 saveEle = copyEle[i];
             }
         }
-        // obj.parentNode.parentNode.parentNode.appendChild(saveEle);
-        // obj.parentNode.parentNode.parentNode.removeChild(obj.parentNode.parentNode);
 
-        // obj.parentNode.parentNode.removeChild(obj.parentNode);
+        lastParent.appendChild(saveEle);
+        prevParent.removeChild(deleteEle);
+
+        saveEle.style.top = prevParentTop;
+        saveEle.style.left = prevParentLeft;
+        saveEle.style.width = prevParentWidth;
+        saveEle.style.height = prevParentHeight;
+        lastParent.removeChild(prevParent);
     },
     moveContentMenuOne: function(that, e) {
         // console.log(e)

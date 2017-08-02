@@ -193,7 +193,7 @@ body {
 .showState1 {
     background: url(../image/empty.png) no-repeat center;
     display: none;
-    border: 2px solid green;
+    /*border: 2px solid green;*/
     z-index: 2;
 }
 .showState1 h4 {
@@ -309,12 +309,9 @@ body {
     display: none;
     z-index: 999;
 }
-.parentNodes {
-    position: absolute;
-    background: rgba(0, 0, 0, .5);
-}
+
 .parentList {
     position: absolute;
-    background: rgba(204, 0, 204, .5);
+    /*background: rgba(204, 0, 204, .5);*/
     z-index: 5;
 }

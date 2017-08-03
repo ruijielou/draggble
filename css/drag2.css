@@ -168,7 +168,7 @@ body {
     position: absolute;
     border: 1px solid #cdcdcd;
     color: #cdcdcd;
-    z-index: 998;
+    z-index: 10;
 }
 .dotted {
     border: 2px dotted red;
@@ -307,11 +307,41 @@ body {
     background-size: contain;
     cursor: pointer;
     display: none;
-    z-index: 999;
+    z-index: 998;
 }
 
 .parentList {
     position: absolute;
     /*background: rgba(204, 0, 204, .5);*/
     z-index: 5;
+}
+@media screen and (max-width: 678px){
+    .content-menu {
+        width: 100%;
+    }
+}
+.draglogo {
+    position: absolute;
+    width: 1.5rem;
+    height: 1rem;
+    top: 5px;
+    left: 50%;
+    transform: translateY(-50%);
+    background: url(../image/draglogo.png) no-repeat;
+    background-size: cover;
+    cursor: move;
+    display: none;
+    z-index: 999;
+}
+.stopDragMask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    background: rgba(0, 0, 0, .5);
+    opacity: 0.5;
+    display: none;
+}
+.content-menu.active {
+    background: rgba(0, 0, 0, .5);
 }

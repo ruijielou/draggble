@@ -225,7 +225,8 @@ body {
     display: none;
 }
 .dragStart {
-    border: 2px solid #ea9518;
+    /*border: 2px solid #ea9518;*/
+    z-index: 1000;
 }
 
 .content-menu span {
@@ -266,22 +267,20 @@ body {
     position: absolute;
     width: 2px;
     height: 100%;
-    background: transparent;
+    background: #ea9518;
     display: none;
-    padding: 10px;
 }
 .topLine, .bottomLine  {
     position: absolute;
     width: 100%;
     height: 2px;
-    background: transparent;
+    background: #ea9518;
     display: none;
-    padding: 10px;
 }
-.leftLine, .topLine {
-    left: 0;
+/*.leftLine, .topLine {
+    // left: 0;
     top: 0;
-}
+}*/
 .leftLine {
     cursor: w-resize;
 }
@@ -289,12 +288,12 @@ body {
     cursor: n-resize;
 }
 .rightLine {
-    right: 0;
-    top: 0;
+/*    right: 0;
+    top: 0;*/
     cursor: e-resize;
 }
 .bottomLine {
-    bottom: 0;left:0;
+    /*bottom: 0;left:0;*/
     cursor: s-resize;
 }
 .delete {
@@ -314,6 +313,9 @@ body {
     position: absolute;
     /*background: rgba(204, 0, 204, .5);*/
     z-index: 5;
+}
+.parentList.hover {
+    border: 1px solid #000;
 }
 @media screen and (max-width: 678px){
     .content-menu {

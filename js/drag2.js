@@ -381,6 +381,11 @@ MyDrag.prototype = {
         targetParent.appendChild(this.creatMask);
     },
 
+    // drop的时候需要考虑的问题
+    // 1.左侧控件拖过来时的拖放
+    //
+    // 2.图形拖拽的时候的拖放
+    //
     drop: function(that, obj, e) {
         var eleDragParent = null;
         var ifCreatParetn = true;
@@ -390,7 +395,7 @@ MyDrag.prototype = {
 
         // 判断拖拽对象是左侧菜单栏拖过来的还是当前图形控件拖过来的
 
-        var content = document.querySelectorAll('.content-menu');
+        var content = document.querySelectorAll('.content-menu') || [];
 
         var parentNodes = '',
             html = '',
@@ -398,8 +403,10 @@ MyDrag.prototype = {
             str = e.dataTransfer.getData('source');
 
         if (that.eleDrag && that.eleDrag.classList.contains('content-menu')) {
+            // 如果拖拽对象是图形控件就不创建新的元素
             html = that.eleDrag;
             eleDragParent = that.eleDrag.parentNode;
+            // 判断拖拽对象和释放对象是同一个父级,如果是同一个父级就不创建新的父级
             if (eleDragParent == obj.parentNode) {
                 ifCreatParetn = false;
             } else {
@@ -407,16 +414,12 @@ MyDrag.prototype = {
                 that.deleteContent(eleDragParentobj);
                 // eleDragParent.parentNode.removeChild(eleDragParent);
             }
-
         } else {
-            if (str != "") {
-                html = this.creatHtml(str);
-            } else {
-                html = this.creatHtml();
-            }
+
+            html = str == "" ? this.creatHtml() : this.creatHtml(str);
         }
         // 如果当前是空白的第一次拖过来的内容
-        // 需要生成一个最父级，和右边空白区域的容器
+        // 需要生成一个父级，和右边空白区域的容器
         if (content.length == 0 && that.dragDir !== 'middle') {
             // 创建一个父级容器
             parentNodes = document.createElement('div');
@@ -544,6 +547,27 @@ MyDrag.prototype = {
                     // parentNodes.appendChild(otherTarget);
                     targetParent.appendChild(html);
                 }
+            } else {
+                // 如果
+                // if (that.dragDir !== 'middle') {
+
+                //     var otherTarget = target;
+                //     var targetParent = target.parentNode;
+                //     targetParent.removeChild(target);
+                //     // parentNodes.appendChild(otherTarget);
+                //     targetParent.appendChild(parentNodes);
+
+                // } else {
+                //     var otherTarget = target;
+                //     var targetParent = target.parentNode;
+                //      html.style.left = targetParent.style.left;
+                //     html.style.top = targetParent.style.top;
+                //     html.style.width = targetParent.style.width;
+                //     html.style.height = targetParent.style.height;
+                //     targetParent.removeChild(target);
+                //     // parentNodes.appendChild(otherTarget);
+                //     targetParent.appendChild(html);
+                // }
             }
 
         }
@@ -646,13 +670,18 @@ MyDrag.prototype = {
 
         topLine = document.createElement('div');
         topLine.classList.add('topLine');
+        topLine.style.top = "0";
+
         bottomLine = document.createElement('div');
         bottomLine.classList.add('bottomLine');
+        bottomLine.style.bottom = "0";
 
         leftLine = document.createElement('div');
         leftLine.classList.add('leftLine');
+        leftLine.style.left = "0";
         rightLine = document.createElement('div');
         rightLine.classList.add('rightLine');
+        rightLine.style.right = "0";
 
         html.appendChild(leftLine);
         html.appendChild(rightLine);
@@ -660,6 +689,9 @@ MyDrag.prototype = {
         html.appendChild(bottomLine);
 
         that.moveLeft(leftLine);
+        that.moveLeft(rightLine);
+        that.moveLeft(topLine);
+        that.moveLeft(bottomLine);
 
         header = document.createElement('div');
         listContent = document.createElement('div');
@@ -811,20 +843,98 @@ MyDrag.prototype = {
             // this.style.left = 'calc('+ ss +'% + 2px)';
         })
     },
+    onHoverBorder: function(hoverobj) {
+        var parentsList = document.querySelectorAll('.parentList');
+        var i, len = parentsList.length;
+
+        for (i = 0; i < len; i++) {
+            parentsList[i].classList.remove('hover');
+        }
+        hoverobj.classList.add('hover');
+    },
     // 绑定向左拖拽事件
+    // 在拖拽开始的时候判断拖拽的方向，根据方向来确定是要在哪个方向进行缩放当前div
+    // 把当前拖拽的移动距离按照当前盒子在父级所占的百分比来给当前盒子增加或者减少
+    // 最后把拖拽的方向都归为0
     moveLeft: function(ele) {
         var that = this;
         var partten = /\((.*?)\%/;
+        var initX = 0,
+            initY = 0,
+            sourceParent = null,
+            sourceParentWidth = 0,
+            sourceParentHeight = 0,
+            sourceParentTop = 0,
+            sourceParentLeft = 0,
+            left = 0, top = 0, width = 0, height = 0;
         // parseInt(partten.exec(target.style.left)[1]);
         ele.addEventListener('mousedown', function(event) {
             var e = event || window.event;
             var x = parseInt(e.pageX);
             var y = parseInt(e.pageY);
-            var left = 0;
-            var top = 0;
+
+            var moveCalc = 0;
+            // var top = parseInt(ele.style.top);
+            // var right = parseInt(ele.style.right);
+            // var bottom = parseInt(ele.style.bottom);
+
+
             var width = 0;
             var height = 0;
+            // 获取当前div的属性值
             var source = ele.parentNode;
+            var sourceLeft = parseInt(partten.exec(source.style.left)[1]);
+            var sourceTop = parseInt(partten.exec(source.style.top)[1]);
+            var sourceWidth = parseInt(partten.exec(source.style.width)[1]);
+            var sourceHeight = parseInt(partten.exec(source.style.height)[1]);
+
+            // 获取当前div的父级的属性值
+            sourceParent = source.parentNode;
+            sourceParentWidth = parseInt(sourceParent.offsetWidth);
+            sourceParentHeight = parseInt(sourceParent.offsetHeight);
+            sourceParentTop = parseInt(partten.exec(sourceParent.style.top)[1]);
+            sourceParentLeft = parseInt(partten.exec(sourceParent.style.left)[1]);
+
+            var eleClass = ele.className;
+            switch (eleClass) {
+                case "leftLine":
+                if(sourceLeft == 0){
+                    return
+                }
+                    moveCalc = parseInt(ele.style.left);
+                    break;
+                case "rightLine":
+                if(sourceLeft + sourceWidth >= 100) return
+                    moveCalc = parseInt(ele.style.right);
+                    break;
+                case "topLine":
+                 if(sourceTop == 0){
+                    return
+                }
+                    moveCalc = parseInt(ele.style.top);
+                    break;
+                case "bottomLine":
+                 if(sourceTop + sourceHeight >= 100) return
+                    moveCalc = parseInt(ele.style.bottom);
+                    break;
+            }
+
+            var childnodesList = sourceParent.childNodes;
+            var sourceBrother = null;
+            for(var i = 0; i < childnodesList.length; i++){
+                if(childnodesList[i] != source){
+                    sourceBrother = childnodesList[i];
+                }
+            }
+            // 改变当前div的属性值也改变另外一个div的属性值
+            if(sourceBrother != null){
+                var sourceBrotherLeft = parseInt(partten.exec(sourceBrother.style.left)[1]);
+                var sourceBrotherTop = parseInt(partten.exec(sourceBrother.style.top)[1]);
+                var sourceBrotherWidth = parseInt(partten.exec(sourceBrother.style.width)[1]);
+                var sourceBrotherHeight = parseInt(partten.exec(sourceBrother.style.height)[1]);
+            }
+
+
             var parentBoxWidth = document.body.clientWidth - 200;
             var lastX = 0;
             if (source) {
@@ -835,47 +945,95 @@ MyDrag.prototype = {
             }
 
             document.onmousemove = function(ev) {
+                // console.log('ddddd')
                 var ev = ev || window.event;
-                left = Number(Number(partten.exec(source.style.left)[1]).toFixed(4));
-                top = Number(Number(partten.exec(source.style.top)[1]).toFixed(4));
-                width = Number(Number(partten.exec(source.style.width)[1]).toFixed(4));
-                height = Number(Number(partten.exec(source.style.height)[1]).toFixed(4));
-
                 var nowX = parseInt(ev.pageX);
                 var nowY = parseInt(ev.pageY);
+                initX = nowX - x + moveCalc;
+                initY = nowY - y + moveCalc;
+                if (ele.classList.contains('leftLine')) {
+                    // if(sourceLeft == 0) console.log('left'); return
+                    ele.style.left = initX + 'px';
 
-                var calcXs = Number((((nowX - x) / parentBoxWidth) - lastX).toFixed(4));
-
-                if (nowX - x < 0) { //向左
-                    // alert('ddddd')
-                    source.style.width = 'calc(' + (width - calcXs) + '%)';
-                    source.style.left = 'calc(' + (left + calcXs) + '%)';
-
-                } else if (nowX - x == 0) {
-                    return
-                } else if (nowX - x > 0) { //向右
-                    // alert('yyyyy')
-                    source.style.left = 'calc(' + (left + calcXs) + '%)';
-                    source.style.width = 'calc(' + (width - calcXs) + '%)';
+                } else if (ele.classList.contains('rightLine')) {
+                    // initX = (nowX - x) + moveCalc;
+                    ele.style.right = -initX + 'px';
+                } else if (ele.classList.contains('topLine')) {
+                    // if(sourceTop == 0) return
+                    ele.style.top = initY + 'px';
+                } else if (ele.classList.contains('bottomLine')) {
+                    // initY = nowY - y + moveCalc;
+                    ele.style.bottom = -initY + 'px';
                 }
-                lastX = calcXs;
-                // var initX = nowX - x + left;
-                // var initY = nowY - y + top;
-
-
-                // source.style.width = calc(parseInt(partten.exec(source.style.widht)[1])+that.calcX +'%'-2px);
-                // source.style.top = initY + 'px';
             }
+            document.onmouseup = function() {
+
+                var calcX = Number((initX / sourceParentWidth).toFixed(3))*100;
+                var calcY = Number((initY / sourceParentHeight).toFixed(3))*100;
+                console.log(calcY);
+                console.log(calcX);
+
+                  if (ele.classList.contains('leftLine')) {
+                    source.style.left = 'calc(' + (left + parseInt(calcX)) + '% + 2px)';
+                    source.style.width = 'calc(' + (width - parseInt(calcX)) + '% - 2px)';
+                    // sourceBrother.style.left = 'calc(' + (sourceBrotherLeft + parseInt(calcX)) + '% + 2px)';
+                    sourceBrother.style.width = 'calc(' + (sourceBrotherWidth + parseInt(calcX)) + '% - 2px)';
+                    ele.style.left = 0;
+
+                } else if (ele.classList.contains('rightLine')) {
+                    // source.style.left = 'calc(' + (left - parseInt(calcX)) + '% + 2px)';
+                    source.style.width = 'calc(' + (width + parseInt(calcX)) + '% - 2px)';
+                    sourceBrother.style.width = 'calc(' + (sourceBrotherWidth - parseInt(calcX)) + '% - 2px)';
+                    sourceBrother.style.left = 'calc(' + (sourceBrotherLeft + parseInt(calcX)) + '% + 2px)';
+                    ele.style.right = 0;
+                } else if (ele.classList.contains('topLine')) {
+                    source.style.top = 'calc(' + (top + parseInt(calcY)) + '% + 2px)';
+                    source.style.height = 'calc(' + (height - parseInt(calcY)) + '% - 2px)';
+                    sourceBrother.style.height = 'calc(' + (sourceBrotherHeight + parseInt(calcY)) + '% - 2px)';
+                    ele.style.top = 0;
+                } else if (ele.classList.contains('bottomLine')) {
+                    // source.style.top = 'calc(' + (top + parseInt(calcY)) + '% + 2px)';
+                    source.style.height = 'calc(' + (height + parseInt(calcY)) + '% - 2px)';
+                    sourceBrother.style.top = 'calc(' + (sourceBrotherTop + parseInt(calcY)) + '% + 2px)';
+                    sourceBrother.style.height = 'calc(' + (sourceBrotherHeight - parseInt(calcY)) + '% - 2px)';
+                    ele.style.bottom = 0;
+                }
+                document.onmousemove = null;
+                document.onmouseup = null;
+                // 计算移动距离在父级所占的百分比
+
+            };
         }, true);
 
-        document.addEventListener('mouseup', function() {
-            // source.style.left = 'calc(' + (left + that.calcXWidth) + '% + 2px)';
-            // source.style.width = 'calc(' + (width - that.calcXWidth) + '% + 2px)';
-            // that.targetBoxobj.onmousemove = null;
-            document.onmousemove = null;
-            document.onmouseup = null;
-        });
+
     },
+
+    // moveLeft: function(moveDown, source) {
+    //     moveDown.on('mousedown', function(event) {
+    //         var e = event || window.event;
+    //         $(this).css('cursor', 'move');
+    //         var x = parseInt(e.pageX);
+    //         var y = parseInt(e.pageY);
+    //         var left = parseInt(source.css('left'));
+    //         var top = parseInt(source.css('top'));
+    //         $(document).bind('mousemove', function(ev) {
+    //             var ev = ev || window.event;
+    //             var nowX = parseInt(ev.pageX);
+    //             var nowY = parseInt(ev.pageY);
+    //             var initX = nowX - x + left;
+    //             var initY = nowY - y + top;
+    //             source.css({
+    //                 'left': initX,
+    //                 'top': initY
+    //             });
+    //         })
+    //     });
+    //     $(document).bind('mouseup', function() {
+    //         moveDown.css('cursor', 'default');
+
+    //         $(document).unbind('mousemove');
+    //     });
+    // }
     // 判断拖拉的方向
     getDirection: function(el) {
         var xPos, yPos, offset, dir;

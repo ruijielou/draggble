@@ -80,11 +80,13 @@ MyDrag.prototype = {
                 return false;
             };
 
-            this.dragList[i].addEventListener('dragstart', this.dragstart);
+            this.dragList[i].addEventListener('dragstart', function(e){
+                that.dragstart(that,this,e)
+            });
 
             this.dragList[i].ondragend = function(ev) {
 
-                ev.dataTransfer.clearData("sourceId");
+                // ev.dataTransfer.clearData("sourceId");
 
                 that.showState2.style.display = "none";
 
@@ -129,11 +131,11 @@ MyDrag.prototype = {
 
     },
 
-    dragstart: function(that) {
-        var e = window.event || event;
-        var sourceText = this.dataset['sourceText'];
+    dragstart: function(that,obj, e) {
+        var e = window.event || e;
+        var sourceText = obj.dataset['sourceText'];
 
-        that.eleDrag = this;
+        that.eleDrag = obj;
         e.dataTransfer.setData('source', sourceText);
     },
 
@@ -144,7 +146,7 @@ MyDrag.prototype = {
         if (mask.length == 0) {
             this.dragenter(obj);
         }
-        var e = event || window.event;
+        var e = e || window.event;
         var maskLeft = 0;
         var maskTop = 0;
         var maskWidth = 0;
@@ -824,7 +826,7 @@ MyDrag.prototype = {
         var e = e || window.event;
 
         this.eleDrag = obj.parentNode;
-        console.log(this.eleDrag)
+        // console.log(this.eleDrag)
         obj.parentNode.style.zIndex = '-1';
         obj.parentNode.classList.add('active');
     },
@@ -1027,8 +1029,8 @@ MyDrag.prototype = {
 
                 var calcX = Number((initX / sourceParentWidth).toFixed(3)) * 100;
                 var calcY = Number((initY / sourceParentHeight).toFixed(3)) * 100;
-                console.log(calcY);
-                console.log(calcX);
+                // console.log(calcY);
+                // console.log(calcX);
 
                 if (ele.classList.contains('leftLine')) {
                     source.style.left = 'calc(' + (left + parseInt(calcX)) + '% + 2px)';

@@ -390,7 +390,7 @@ MyDrag.prototype = {
         var eleDragParent = null;
         var ifCreatParetn = true;
         // console.log(that.eleDrag)
-        // 判断释放目标对象是否为拖拽对象
+        // 判断释放目标对象是否为拖拽对象,防止自己对自己拖放
         if (obj.classList.contains('active')) return;
 
         // 判断拖拽对象是左侧菜单栏拖过来的还是当前图形控件拖过来的
@@ -403,25 +403,26 @@ MyDrag.prototype = {
             str = e.dataTransfer.getData('source');
 
         if (that.eleDrag && that.eleDrag.classList.contains('content-menu')) {
-            // 如果拖拽对象是图形控件就不创建新的元素
+            // 如果拖拽对象是图形控件就不创建新的元素，保存拖拽图形
             html = that.eleDrag;
             eleDragParent = that.eleDrag.parentNode;
             // 判断拖拽对象和释放对象是同一个父级,如果是同一个父级就不创建新的父级
             if (eleDragParent == obj.parentNode) {
                 ifCreatParetn = false;
             } else {
+                // 要在原位置把当前图形给删除了
                 var eleDragParentobj = that.eleDrag.querySelector('.delete');
                 that.deleteContent(eleDragParentobj);
                 // eleDragParent.parentNode.removeChild(eleDragParent);
             }
         } else {
-
+            // 如果是左侧tab栏拖拽过来的就创建新元素
             html = str == "" ? this.creatHtml() : this.creatHtml(str);
         }
         // 如果当前是空白的第一次拖过来的内容
         // 需要生成一个父级，和右边空白区域的容器
         if (content.length == 0 && that.dragDir !== 'middle') {
-            // 创建一个父级容器
+            // 创建一个父级容器 第一次拖拽
             parentNodes = document.createElement('div');
             parentNodes.classList.add('parentList');
             parentNodes.style.width = 'calc(100%)';
@@ -434,7 +435,7 @@ MyDrag.prototype = {
             html.style.top = 'calc(' + that.creatMask.style.top + ' + 2px)';
             html.style.width = 'calc(' + that.creatMask.style.width + ' - 2px)';
             html.style.height = 'calc(' + that.creatMask.style.height + ' - 2px)';
-            this.addEvent(html);
+            // this.addEvent(html);
 
             // 创建空白区域的占位控件
             placeHtml = this.creatHtml('空白区域');
@@ -450,12 +451,12 @@ MyDrag.prototype = {
             this.addEvent(placeHtml);
 
         } else if (content.length == 0 && that.dragDir == 'middle') {
-
+            // 如果第一低拖拽生成图形并且是全屏覆盖的图形元素的话
             html.style.left = 'calc(' + that.creatMask.style.left + ' + 2px)';
             html.style.top = 'calc(' + that.creatMask.style.top + ' + 2px)';
             html.style.width = 'calc(' + that.creatMask.style.width + ' - 2px)';
             html.style.height = 'calc(' + that.creatMask.style.height + ' - 2px)';
-            this.addEvent(html);
+
             this.targetBoxobj.appendChild(html);
 
         } else {
@@ -520,15 +521,25 @@ MyDrag.prototype = {
                 target.style.width = 'calc(100% - 2px)';
                 target.style.height = 'calc(50% - 2px)';
             } else if (that.dragDir == 'middle') {
-                html.style.left = target.style.left;
-                html.style.top = target.style.top;
-                html.style.width = target.style.width;
-                html.style.height = target.style.height;
+                // var parentList = document.querySelectorAll('.parentList');
+                // if (content.length == 2) {
+                //     html.style.left = 'calc(0% + 2px)';
+                //     html.style.top = 'calc(0% + 2px)';
+                //     html.style.width = 'calc(100% - 2px)';
+                //     html.style.height = 'calc(100% - 2px)';
+                // } else {
+                    html.style.left = target.style.left;
+                    html.style.top = target.style.top;
+                    html.style.width = target.style.width;
+                    html.style.height = target.style.height;
+                // }
+
             }
 
-            this.addEvent(html);
-            if (ifCreatParetn) {
-                if (that.dragDir !== 'middle') {
+            // this.addEvent(html);
+            if (ifCreatParetn) { //如果是左侧拖拽的释放
+
+                if (that.dragDir !== 'middle') { //如果不是全屏覆盖的释放
                     parentNodes.appendChild(html);
                     parentNodes.style.top = that.parentTop;
                     parentNodes.style.left = that.parentLeft;
@@ -540,42 +551,38 @@ MyDrag.prototype = {
                     parentNodes.appendChild(otherTarget);
                     targetParent.appendChild(parentNodes);
 
-                } else {
-                    var otherTarget = target;
+                } else { //如果是全屏覆盖的释放，需要删除当前释放的目标对象并且代替它
+                    // var otherTarget = target;
                     var targetParent = target.parentNode;
                     targetParent.removeChild(target);
                     // parentNodes.appendChild(otherTarget);
                     targetParent.appendChild(html);
                 }
-            } else {
-                // 如果
-                // if (that.dragDir !== 'middle') {
-
-                //     var otherTarget = target;
+            } else if (!ifCreatParetn) { //如果是右侧图形拖拽的释放
+                // if (that.dragDir == 'middle') {
+                //     // 判断如果是全屏覆盖的问题
                 //     var targetParent = target.parentNode;
-                //     targetParent.removeChild(target);
-                //     // parentNodes.appendChild(otherTarget);
-                //     targetParent.appendChild(parentNodes);
 
-                // } else {
-                //     var otherTarget = target;
-                //     var targetParent = target.parentNode;
-                //      html.style.left = targetParent.style.left;
-                //     html.style.top = targetParent.style.top;
-                //     html.style.width = targetParent.style.width;
-                //     html.style.height = targetParent.style.height;
-                //     targetParent.removeChild(target);
-                //     // parentNodes.appendChild(otherTarget);
-                //     targetParent.appendChild(html);
+                //     if (that.dragDir == 'middle' && content.length == 2) {
+                //         var otherparent = targetParent.parentNode;
+
+                //         // otherparent.removeChild(targetParent);
+                //         that.targetBoxobj.appendChild(html);
+                //     } else {
+                //         targetParent.removeChild(target);
+                //         targetParent.appendChild(html);
+                //     }
                 // }
             }
 
         }
+        this.addEvent(html);
         var mask = document.querySelectorAll('.mask');
 
         for (var i = 0; i < mask.length; i++) {
             mask[i].parentNode.removeChild(mask[i]);
         }
+        // debugger
     },
     // 添加事件模式
     addEvent: function(html) {
@@ -592,7 +599,7 @@ MyDrag.prototype = {
             e.preventDefault();
             // this.classList.add('dotted')
             that.dragover(that, this, e);
-            return true
+
         }, false);
 
         html.addEventListener('dragleave', function(e) {
@@ -602,13 +609,16 @@ MyDrag.prototype = {
                 mask[i].parentNode.removeChild(mask[i]);
             }
             // this.classList.remove('dotted')
-            return true
+
         }, false);
 
-        html.addEventListener('drop', function(e) {
+        // html.addEventListener('drop', function(e) {
+        //     that.drop(that, this, e);
+
+        // }, false);
+        html.ondrop = function(e){
             that.drop(that, this, e);
-            return true
-        }, false);
+        }
     },
 
     // 添加生成每个图形的代码结构
@@ -866,7 +876,10 @@ MyDrag.prototype = {
             sourceParentHeight = 0,
             sourceParentTop = 0,
             sourceParentLeft = 0,
-            left = 0, top = 0, width = 0, height = 0;
+            left = 0,
+            top = 0,
+            width = 0,
+            height = 0;
         // parseInt(partten.exec(target.style.left)[1]);
         ele.addEventListener('mousedown', function(event) {
             var e = event || window.event;
@@ -898,36 +911,36 @@ MyDrag.prototype = {
             var eleClass = ele.className;
             switch (eleClass) {
                 case "leftLine":
-                if(sourceLeft == 0){
-                    return
-                }
+                    if (sourceLeft == 0) {
+                        return
+                    }
                     moveCalc = parseInt(ele.style.left);
                     break;
                 case "rightLine":
-                if(sourceLeft + sourceWidth >= 100) return
+                    if (sourceLeft + sourceWidth >= 100) return
                     moveCalc = parseInt(ele.style.right);
                     break;
                 case "topLine":
-                 if(sourceTop == 0){
-                    return
-                }
+                    if (sourceTop == 0) {
+                        return
+                    }
                     moveCalc = parseInt(ele.style.top);
                     break;
                 case "bottomLine":
-                 if(sourceTop + sourceHeight >= 100) return
+                    if (sourceTop + sourceHeight >= 100) return
                     moveCalc = parseInt(ele.style.bottom);
                     break;
             }
 
             var childnodesList = sourceParent.childNodes;
             var sourceBrother = null;
-            for(var i = 0; i < childnodesList.length; i++){
-                if(childnodesList[i] != source){
+            for (var i = 0; i < childnodesList.length; i++) {
+                if (childnodesList[i] != source) {
                     sourceBrother = childnodesList[i];
                 }
             }
             // 改变当前div的属性值也改变另外一个div的属性值
-            if(sourceBrother != null){
+            if (sourceBrother != null) {
                 var sourceBrotherLeft = parseInt(partten.exec(sourceBrother.style.left)[1]);
                 var sourceBrotherTop = parseInt(partten.exec(sourceBrother.style.top)[1]);
                 var sourceBrotherWidth = parseInt(partten.exec(sourceBrother.style.width)[1]);
@@ -968,12 +981,12 @@ MyDrag.prototype = {
             }
             document.onmouseup = function() {
 
-                var calcX = Number((initX / sourceParentWidth).toFixed(3))*100;
-                var calcY = Number((initY / sourceParentHeight).toFixed(3))*100;
+                var calcX = Number((initX / sourceParentWidth).toFixed(3)) * 100;
+                var calcY = Number((initY / sourceParentHeight).toFixed(3)) * 100;
                 console.log(calcY);
                 console.log(calcX);
 
-                  if (ele.classList.contains('leftLine')) {
+                if (ele.classList.contains('leftLine')) {
                     source.style.left = 'calc(' + (left + parseInt(calcX)) + '% + 2px)';
                     source.style.width = 'calc(' + (width - parseInt(calcX)) + '% - 2px)';
                     // sourceBrother.style.left = 'calc(' + (sourceBrotherLeft + parseInt(calcX)) + '% + 2px)';

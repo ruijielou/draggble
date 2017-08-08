@@ -413,6 +413,7 @@ MyDrag.prototype = {
                 ifCreatParetn = false;
             } else {
                 // 要在原位置把当前图形给删除了
+
                 var eleDragParentobj = that.eleDrag.querySelector('.delete');
                 that.deleteContent(eleDragParentobj);
                 // eleDragParent.parentNode.removeChild(eleDragParent);
@@ -562,6 +563,8 @@ MyDrag.prototype = {
                     // parentNodes.appendChild(otherTarget);
 
                     targetParent.appendChild(html);
+                    }else {
+                        return
                     }
 
                 }
@@ -596,7 +599,20 @@ MyDrag.prototype = {
 
 
 
+                    }else {
+                        return
                     }
+               }else {
+                    parentNodes.appendChild(html);
+                    parentNodes.style.top = that.parentTop;
+                    parentNodes.style.left = that.parentLeft;
+                    parentNodes.style.height = that.parentHeight;
+                    parentNodes.style.width = that.parentWidth;
+                    var otherTarget = target;
+                    var targetParent = target.parentNode;
+                    targetParent.removeChild(target);
+                    parentNodes.appendChild(otherTarget);
+                    targetParent.appendChild(parentNodes);
                }
             }
 

@@ -80,8 +80,8 @@ MyDrag.prototype = {
                 return false;
             };
 
-            this.dragList[i].addEventListener('dragstart', function(e){
-                that.dragstart(that,this,e)
+            this.dragList[i].addEventListener('dragstart', function(e) {
+                that.dragstart(that, this, e)
             });
 
             this.dragList[i].ondragend = function(ev) {
@@ -131,7 +131,7 @@ MyDrag.prototype = {
 
     },
 
-    dragstart: function(that,obj, e) {
+    dragstart: function(that, obj, e) {
         var e = window.event || e;
         var sourceText = obj.dataset['sourceText'];
 
@@ -406,7 +406,7 @@ MyDrag.prototype = {
             str = e.dataTransfer.getData('source');
 
         if (that.eleDrag && that.eleDrag.classList.contains('content-menu')) {
-            isIconOrImg = true;//用一个变量保存当前是左侧元素还是图形元素的释放
+            isIconOrImg = true; //用一个变量保存当前是左侧元素还是图形元素的释放
             // 如果拖拽对象是图形控件就不创建新的元素，保存拖拽图形
             html = that.eleDrag;
             eleDragParent = that.eleDrag.parentNode;
@@ -533,10 +533,10 @@ MyDrag.prototype = {
                 //     html.style.width = 'calc(100% - 2px)';
                 //     html.style.height = 'calc(100% - 2px)';
                 // } else {
-                    html.style.left = target.style.left;
-                    html.style.top = target.style.top;
-                    html.style.width = target.style.width;
-                    html.style.height = target.style.height;
+                html.style.left = target.style.left;
+                html.style.top = target.style.top;
+                html.style.width = target.style.width;
+                html.style.height = target.style.height;
                 // }
 
             }
@@ -558,36 +558,38 @@ MyDrag.prototype = {
 
                 } else { //如果是全屏覆盖的释放，需要删除当前释放的目标对象并且代替它
                     var conf = window.confirm('确定要替换吗dddd？');
-                    if(conf){
-                    // var otherTarget = target;
-                    var targetParent = target.parentNode;
-                    targetParent.removeChild(target);
-                    // parentNodes.appendChild(otherTarget);
+                    if (conf) {
+                        // var otherTarget = target;
+                        var targetParent = target.parentNode;
+                        targetParent.removeChild(target);
+                        // parentNodes.appendChild(otherTarget);
 
-                    targetParent.appendChild(html);
-                    }else {
+                        targetParent.appendChild(html);
+                    } else {
                         return
                     }
 
                 }
-            } else  { //如果是右侧图形拖拽的释放
+            } else { //如果是右侧图形拖拽的释放
                 // 1.释放的时候如果是同一个父级，1》如果是全屏释放
                 // 2.释放的时候不是同一个父级的问题，
+                // 3.需要考虑一下如果是同一个父级拖放不需要创建新的父级的问题？？？？？？
+                //
                 var len = document.querySelectorAll('.content-menu').length;
                 var targetParent = target.parentNode;
-               if(that.dragDir == 'middle'){
+                if (that.dragDir == 'middle') { //如果是中间释放的话
                     var conf = window.confirm('确定要替换吗？');
-                    if(conf){
-                        if(ifCreatParetn) {//如果不是同一个父级的时候
-                             html.style.left = target.style.left;
-                             html.style.top = target.style.top;
-                             html.style.width = target.style.width;
-                             html.style.height = target.style.height;
-                             targetParent.removeChild(target);
+                    if (conf) {
+                        if (ifCreatParetn) { //如果不是同一个父级的时候
+                            html.style.left = target.style.left;
+                            html.style.top = target.style.top;
+                            html.style.width = target.style.width;
+                            html.style.height = target.style.height;
+                            targetParent.removeChild(target);
 
-                             targetParent.appendChild(html);
+                            targetParent.appendChild(html);
 
-                        }else {//如果是同一个父级的话，需要删除他们共有的父级和target
+                        } else { //如果是同一个父级的话，需要删除他们共有的父级和target
 
                             var sameparent = targetParent.parentNode;
                             html.style.left = targetParent.style.left;
@@ -598,24 +600,32 @@ MyDrag.prototype = {
 
                             sameparent.appendChild(html);
                         }
-
-
-
-                    }else {
-                        return
                     }
-               }else {
-                    parentNodes.appendChild(html);
-                    parentNodes.style.top = that.parentTop;
-                    parentNodes.style.left = that.parentLeft;
-                    parentNodes.style.height = that.parentHeight;
-                    parentNodes.style.width = that.parentWidth;
-                    var otherTarget = target;
-                    var targetParent = target.parentNode;
-                    targetParent.removeChild(target);
-                    parentNodes.appendChild(otherTarget);
-                    targetParent.appendChild(parentNodes);
-               }
+                } else {
+                    if(!ifCreatParetn){
+                        // 如果是同一个父级的情况，只需要确定位置，不需要创建父级
+                        // var otherTarget = target;
+                        var targetParent = target.parentNode;
+                        // targetParent.removeChild(target);
+                        // parentNodes.appendChild(otherTarget);
+
+                        targetParent.appendChild(html);
+                    }else{
+                        // parentNodes = document.createElement('div');
+                        // parentNodes.classList.add('parentList');
+                        parentNodes.appendChild(html);
+                        parentNodes.style.top = that.parentTop;
+                        parentNodes.style.left = that.parentLeft;
+                        parentNodes.style.height = that.parentHeight;
+                        parentNodes.style.width = that.parentWidth;
+                        var otherTarget = target;
+                        var targetParent = target.parentNode;
+                        targetParent.removeChild(target);
+                        parentNodes.appendChild(otherTarget);
+                        targetParent.appendChild(parentNodes);
+                    }
+
+                }
             }
 
         }
@@ -633,12 +643,16 @@ MyDrag.prototype = {
         this.onClickStyle(html);
 
         html.addEventListener('dragenter', function(e) {
+            var e = e || window.event;
+            // console.log('enter')
             that.dropTarget = this;
             that.dragenter(this);
             // this.classList.add('dotted');
         }, false);
 
         html.addEventListener('dragover', function(e) {
+            var e = e || window.event;
+            // console.log(e)
             e.preventDefault();
             // this.classList.add('dotted')
             that.dragover(that, this, e);
@@ -646,6 +660,7 @@ MyDrag.prototype = {
         }, false);
 
         html.addEventListener('dragleave', function(e) {
+            var e = e || window.event;
             var mask = document.querySelectorAll('.mask');
 
             for (var i = 0; i < mask.length; i++) {
@@ -659,7 +674,7 @@ MyDrag.prototype = {
         //     that.drop(that, this, e);
 
         // }, false);
-        html.ondrop = function(e){
+        html.ondrop = function(e) {
             that.drop(that, this, e);
         }
     },
@@ -708,11 +723,13 @@ MyDrag.prototype = {
         html.appendChild(draglogo);
 
         draglogo.addEventListener('dragstart', function(e) {
-            that.dragLogoStart(e, this);
+
+            that.dragLogoStart(e, draglogo);
         });
 
         draglogo.addEventListener('dragend', function(e) {
-            that.dragLogoEnd(e, this);
+
+            that.dragLogoEnd(e, draglogo);
         });
 
 
@@ -806,7 +823,7 @@ MyDrag.prototype = {
                 saveEle = copyEle[i];
             }
         }
-        if(saveEle){
+        if (saveEle) {
             lastParent.appendChild(saveEle);
             saveEle.style.top = prevParentTop;
             saveEle.style.left = prevParentLeft;
@@ -826,12 +843,14 @@ MyDrag.prototype = {
         var e = e || window.event;
 
         this.eleDrag = obj.parentNode;
-        // console.log(this.eleDrag)
+        e.dataTransfer.setData('source','');
+        // console.log('logostart')
         obj.parentNode.style.zIndex = '-1';
         obj.parentNode.classList.add('active');
     },
     dragLogoEnd: function(e, obj) {
         var e = e || window.event;
+        // console.log('logoend')
 
         this.eleDrag = null;
         obj.parentNode.style.zIndex = '998';

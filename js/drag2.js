@@ -26,13 +26,13 @@ function MyDrag(targetBox, line, dragList, showState1, showState2, mask) {
     this.stopDragMask = ''; //生成的元素进行拖拽时的遮罩层
 }
 MyDrag.prototype = {
-    init: function() {
+    init: function () {
         this.lines();
         this.drag();
         this.showState();
     },
     //    生成拖拽目标区域的线
-    lines: function() {
+    lines: function () {
         var column = this.column;
         var calcX = 100 / column;
         var row = this.row;
@@ -61,7 +61,7 @@ MyDrag.prototype = {
             this.line.appendChild(rowLine);
         }
     },
-    showState: function() {
+    showState: function () {
         var contentItem = document.querySelectorAll('.content-menu');
         if (contentItem.length == 0) {
             this.showState1.style.display = 'block';
@@ -72,19 +72,19 @@ MyDrag.prototype = {
         }
     },
 
-    drag: function() {
+    drag: function () {
         var i, len = dragList.length;
         var that = this;
         for (i = 0; i < len; i++) {
-            this.dragList[i].onselectstart = function() {
+            this.dragList[i].onselectstart = function () {
                 return false;
             };
 
-            this.dragList[i].addEventListener('dragstart', function(e) {
+            this.dragList[i].addEventListener('dragstart', function (e) {
                 that.dragstart(that, this, e)
             });
 
-            this.dragList[i].ondragend = function(ev) {
+            this.dragList[i].ondragend = function (ev) {
 
                 // ev.dataTransfer.clearData("sourceId");
 
@@ -95,7 +95,7 @@ MyDrag.prototype = {
             };
         }
 
-        this.targetBoxobj.addEventListener('dragenter', function() {
+        this.targetBoxobj.addEventListener('dragenter', function () {
             that.dropTarget = this;
             var contentItem = document.querySelectorAll('.content-menu');
             // console.log(contentItem)
@@ -110,18 +110,18 @@ MyDrag.prototype = {
             return true
         }, true);
 
-        this.showState2.addEventListener('dragover', function(e) {
+        this.showState2.addEventListener('dragover', function (e) {
             e.preventDefault();
             that.dragover(that, this, e);
             return true
         });
-        this.showState2.addEventListener('drop', function(e) {
+        this.showState2.addEventListener('drop', function (e) {
             that.drop(that, this, e);
         });
-        this.showState2.addEventListener('dragenter', function(e) {
+        this.showState2.addEventListener('dragenter', function (e) {
             that.dragenter(this);
         });
-        this.showState2.addEventListener('dragleave', function(e) {
+        this.showState2.addEventListener('dragleave', function (e) {
             var mask = document.querySelectorAll('.mask');
 
             for (var i = 0; i < mask.length; i++) {
@@ -131,7 +131,7 @@ MyDrag.prototype = {
 
     },
 
-    dragstart: function(that, obj, e) {
+    dragstart: function (that, obj, e) {
         var e = window.event || e;
         var sourceText = obj.dataset['sourceText'];
 
@@ -139,7 +139,7 @@ MyDrag.prototype = {
         e.dataTransfer.setData('source', sourceText);
     },
 
-    dragover: function(that, obj, e) {
+    dragover: function (that, obj, e) {
         // console.log(that.eleDrag)
         if (obj.classList.contains('active')) return;
         var mask = document.querySelectorAll('.mask');
@@ -372,7 +372,7 @@ MyDrag.prototype = {
         that.creatMask.style.height = maskHeight + '%';
     },
     // 拖拽经过目标元素时的事件
-    dragenter: function(obj) {
+    dragenter: function (obj) {
         // 1、添加mask遮罩层，并且添加到当前目标元素的父元素中
         // var creatMask = this.creatMask
         this.creatMask = document.createElement('div');
@@ -388,7 +388,7 @@ MyDrag.prototype = {
     //
     // 2.图形拖拽的时候的拖放
     //
-    drop: function(that, obj, e) {
+    drop: function (that, obj, e) {
         var eleDragParent = null;
         var ifCreatParetn = true;
         var isIconOrImg = false;
@@ -602,7 +602,7 @@ MyDrag.prototype = {
                         }
                     }
                 } else {
-                    if(!ifCreatParetn){
+                    if (!ifCreatParetn) {
                         // 如果是同一个父级的情况，只需要确定位置，不需要创建父级
                         // var otherTarget = target;
                         var targetParent = target.parentNode;
@@ -610,7 +610,7 @@ MyDrag.prototype = {
                         // parentNodes.appendChild(otherTarget);
 
                         targetParent.appendChild(html);
-                    }else{
+                    } else {
                         // parentNodes = document.createElement('div');
                         // parentNodes.classList.add('parentList');
                         parentNodes.appendChild(html);
@@ -638,11 +638,11 @@ MyDrag.prototype = {
         // debugger
     },
     // 添加事件模式
-    addEvent: function(html) {
+    addEvent: function (html) {
         var that = this;
         this.onClickStyle(html);
 
-        html.addEventListener('dragenter', function(e) {
+        html.addEventListener('dragenter', function (e) {
             var e = e || window.event;
             // console.log('enter')
             that.dropTarget = this;
@@ -650,7 +650,7 @@ MyDrag.prototype = {
             // this.classList.add('dotted');
         }, false);
 
-        html.addEventListener('dragover', function(e) {
+        html.addEventListener('dragover', function (e) {
             var e = e || window.event;
             // console.log(e)
             e.preventDefault();
@@ -659,7 +659,7 @@ MyDrag.prototype = {
 
         }, false);
 
-        html.addEventListener('dragleave', function(e) {
+        html.addEventListener('dragleave', function (e) {
             var e = e || window.event;
             var mask = document.querySelectorAll('.mask');
 
@@ -674,13 +674,13 @@ MyDrag.prototype = {
         //     that.drop(that, this, e);
 
         // }, false);
-        html.ondrop = function(e) {
+        html.ondrop = function (e) {
             that.drop(that, this, e);
         }
     },
 
     // 添加生成每个图形的代码结构
-    creatHtml: function(str) {
+    creatHtml: function (str) {
 
         var that = this,
             html = '',
@@ -711,7 +711,7 @@ MyDrag.prototype = {
 
         deletes = document.createElement('div');
         deletes.classList.add('delete');
-        deletes.addEventListener('click', function() {
+        deletes.addEventListener('click', function () {
             that.deleteContent(this);
         })
 
@@ -722,12 +722,12 @@ MyDrag.prototype = {
         draglogo.setAttribute('draggable', true);
         html.appendChild(draglogo);
 
-        draglogo.addEventListener('dragstart', function(e) {
+        draglogo.addEventListener('dragstart', function (e) {
 
             that.dragLogoStart(e, draglogo);
         });
 
-        draglogo.addEventListener('dragend', function(e) {
+        draglogo.addEventListener('dragend', function (e) {
 
             that.dragLogoEnd(e, draglogo);
         });
@@ -785,7 +785,7 @@ MyDrag.prototype = {
         return html;
     },
 
-    deleteContent: function(obj) {
+    deleteContent: function (obj) {
 
         // 删除的时候先获取一下当前删除的父级的内容
         // 保存一下那个没删除的图形
@@ -839,16 +839,16 @@ MyDrag.prototype = {
     // 已经生成的控件在进行拖拽
     // 1.定位一个拖拽按钮，拖拽按钮开始拖拽事件
 
-    dragLogoStart: function(e, obj) {
+    dragLogoStart: function (e, obj) {
         var e = e || window.event;
 
         this.eleDrag = obj.parentNode;
-        e.dataTransfer.setData('source','');
+        e.dataTransfer.setData('source', '');
         // console.log('logostart')
         obj.parentNode.style.zIndex = '-1';
         obj.parentNode.classList.add('active');
     },
-    dragLogoEnd: function(e, obj) {
+    dragLogoEnd: function (e, obj) {
         var e = e || window.event;
         // console.log('logoend')
 
@@ -858,10 +858,10 @@ MyDrag.prototype = {
     },
 
     // 点击某个div显示拖拽状态的样式
-    onClickStyle: function(clickObj) {
+    onClickStyle: function (clickObj) {
         var leftTop, rightTop, leftBottom, rightBottom, leftLine, rightLine, topLine, bottomLine, deletes, draglogo;
         var that = this;
-        clickObj.addEventListener('click', function() {
+        clickObj.addEventListener('click', function () {
 
             var contentList = document.querySelectorAll('.content-menu');
 
@@ -918,7 +918,7 @@ MyDrag.prototype = {
             // this.style.left = 'calc('+ ss +'% + 2px)';
         })
     },
-    onHoverBorder: function(hoverobj) {
+    onHoverBorder: function (hoverobj) {
         var parentsList = document.querySelectorAll('.parentList');
         var i, len = parentsList.length;
 
@@ -931,7 +931,7 @@ MyDrag.prototype = {
     // 在拖拽开始的时候判断拖拽的方向，根据方向来确定是要在哪个方向进行缩放当前div
     // 把当前拖拽的移动距离按照当前盒子在父级所占的百分比来给当前盒子增加或者减少
     // 最后把拖拽的方向都归为0
-    moveLeft: function(ele) {
+    moveLeft: function (ele) {
         var that = this;
         var partten = /\((.*?)\%/;
         var initX = 0,
@@ -946,7 +946,7 @@ MyDrag.prototype = {
             width = 0,
             height = 0;
         // parseInt(partten.exec(target.style.left)[1]);
-        ele.addEventListener('mousedown', function(event) {
+        ele.addEventListener('mousedown', function (event) {
             var e = event || window.event;
             var x = parseInt(e.pageX);
             var y = parseInt(e.pageY);
@@ -1022,7 +1022,7 @@ MyDrag.prototype = {
                 height = parseInt(partten.exec(source.style.height)[1]);
             }
 
-            document.onmousemove = function(ev) {
+            document.onmousemove = function (ev) {
                 // console.log('ddddd')
                 var ev = ev || window.event;
                 var nowX = parseInt(ev.pageX);
@@ -1044,7 +1044,7 @@ MyDrag.prototype = {
                     ele.style.bottom = -initY + 'px';
                 }
             }
-            document.onmouseup = function() {
+            document.onmouseup = function () {
 
                 var calcX = Number((initX / sourceParentWidth).toFixed(3)) * 100;
                 var calcY = Number((initY / sourceParentHeight).toFixed(3)) * 100;
@@ -1113,7 +1113,7 @@ MyDrag.prototype = {
     //     });
     // }
     // 判断拖拉的方向
-    getDirection: function(el) {
+    getDirection: function (el) {
         var xPos, yPos, offset, dir;
         dir = "";
         xPos = window.event.offsetX;
@@ -1138,7 +1138,7 @@ MyDrag.prototype = {
 
 
 var targetbox = document.querySelector('.right-content');
-var dragList = document.querySelectorAll('.item a');
+var dragList = document.querySelectorAll('.dropElement');
 var lines = document.querySelector('.lines')
 var showState1 = document.querySelector('.showState1');
 var showState2 = document.querySelector('.showState2');
@@ -1150,11 +1150,11 @@ mydrag.init();
 
 
 // 获取样式
-var getcss = function(ele, key) {
+var getcss = function (ele, key) {
     return ele.currentStyle ? ele.currentStyle[key] : document.defaultView.getComputedStyle(ele, false)[key];
 }
 // 选择器
-var $ = function(selector) {
+var $ = function (selector) {
     if (!selector) { return []; }
     var arrEle = [];
     if (document.querySelectorAll) {
@@ -1179,3 +1179,113 @@ var $ = function(selector) {
     }
     return arrEle;
 };
+
+
+function SliderBar($, items, leftConsole, Selector) {
+    this.items = items;
+    this.leftConsole = leftConsole;
+    this.Selector = Selector;
+}
+SliderBar.prototype = {
+    init: function () {
+        this.showConsole();
+        this.openOrClose();
+        this.treeClick();
+    },
+    showConsole: function () {
+        var i, that = this;
+        var items = this.items;
+        for (i = 0; i < items.length; i++) {
+            items[i].addEventListener('click', function () {
+                that.leftConsole.style.display = "flex";
+            })
+        }
+    },
+    
+    // 点击左侧请求第一级的列表,然后拼接生成第一级的HTML结构
+    firstFloorData: function(url,data){
+        $.ajax({
+            url: url,
+            type: 'get',
+            dataType: 'jsonp',
+            data: data,
+            success: function(data){
+                console.log(data);
+            }
+        })
+    },
+
+    openOrClose: function () {
+        var sliderItem = this.Selector.sliderItem;
+        var menuList = this.Selector.menuList;
+        var leftMenu = this.Selector.leftMenu;
+        var leftConsole = this.leftConsole;
+        for (var i = 0; i < sliderItem.length; i++) {
+
+            sliderItem[i].addEventListener('click', function () {
+                if(this.classList.contains('active')){
+                    leftMenu.style.width = "0";
+                    this.classList.remove('active');
+                    leftConsole.style.display = "none";
+                    return
+                }else {
+                    leftMenu.style.width = "260px";
+                }
+               
+                for (var j = 0; j < sliderItem.length; j++) {
+                    sliderItem[j].classList.remove('active');
+                    menuList[j].classList.remove('show');
+                    menuList[j].classList.add('hide');
+                }
+
+                if (this.classList.contains('qlik')) {
+                    this.classList.add('active');
+                    menuList[0].classList.add('show');
+                    menuList[0].classList.remove('hide');
+
+                } else if (this.classList.contains('tableau')) {
+                    this.classList.add('active');
+                    menuList[1].classList.add('show');
+                    menuList[1].classList.remove('hide');
+                } else if (this.classList.contains('custom')) {
+                    this.classList.add('active');
+                    menuList[2].classList.add('show');
+                    menuList[2].classList.remove('hide');
+                }
+
+            })
+        }
+    },
+    treeClick: function () {
+        // console.log($('#readFileList .tools-item-title'))
+        $('#QlikSense1 .tools-item-title').on('click', function () {
+            $(this).find('i').toggleClass('icon-down').toggleClass('icon-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+            $('#QlikSense1').find('.tools-item-content').toggleClass('show').toggleClass('hide');
+        });
+        $('#QlikSense2 .tools-item-title').on('click', function () {
+            $(this).find('i').toggleClass('icon-down').toggleClass('icon-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+            $('#QlikSense2').find('.tools-item-content').toggleClass('show').toggleClass('hide');
+        });
+        $('#tableau1 .tools-item-title').on('click', function () {
+            $(this).find('i').toggleClass('icon-down').toggleClass('icon-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+            $('#tableau1').find('.tools-item-content').toggleClass('show').toggleClass('hide');
+        });
+
+        $('.tools-content .tools-content-title').on('click', function () {
+            $(this).find('i').toggleClass('icon-down').toggleClass('icon-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+            $(this).parent().find('.tools-contents').toggleClass('show').toggleClass('hide');
+        });
+    }
+}
+var $ = window.jQuery;
+var leftConsole = document.querySelector('.left-console');
+var sliderItem = document.querySelectorAll('.slider-item');
+var menuList = document.querySelectorAll('.menuList-item');
+var leftMenu = document.querySelector('.left-menu');
+var Selector = {
+    sliderItem: sliderItem,
+    menuList: menuList,
+    leftMenu: leftMenu
+}
+var sliderBar = new SliderBar($, dragList, leftConsole, Selector);
+sliderBar.init();

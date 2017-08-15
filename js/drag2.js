@@ -1133,10 +1133,6 @@ MyDrag.prototype = {
 
 
 
-
-
-
-
 var targetbox = document.querySelector('.right-content');
 var dragList = document.querySelectorAll('.dropElement');
 var lines = document.querySelector('.lines')
@@ -1149,42 +1145,14 @@ mydrag.init();
 
 
 
-// 获取样式
-var getcss = function (ele, key) {
-    return ele.currentStyle ? ele.currentStyle[key] : document.defaultView.getComputedStyle(ele, false)[key];
-}
-// 选择器
-var $ = function (selector) {
-    if (!selector) { return []; }
-    var arrEle = [];
-    if (document.querySelectorAll) {
-        arrEle = document.querySelectorAll(selector);
-    } else {
-        var oAll = document.getElementsByTagName("div"),
-            lAll = oAll.length;
-        if (lAll) {
-            var i = 0;
-            for (i; i < lAll; i += 1) {
-                if (/^\./.test(selector)) {
-                    if (oAll[i].className === selector.replace(".", "")) {
-                        arrEle.push(oAll[i]);
-                    }
-                } else if (/^#/.test(selector)) {
-                    if (oAll[i].id === selector.replace("#", "")) {
-                        arrEle.push(oAll[i]);
-                    }
-                }
-            }
-        }
-    }
-    return arrEle;
-};
 
 
 function SliderBar($, items, leftConsole, Selector) {
+    this.$ = $;
     this.items = items;
     this.leftConsole = leftConsole;
     this.Selector = Selector;
+    this.productId = '';
 }
 SliderBar.prototype = {
     init: function () {
@@ -1194,25 +1162,96 @@ SliderBar.prototype = {
     },
     showConsole: function () {
         var i, that = this;
-        var items = this.items;
+        var items = document.querySelectorAll('.dropElement');
+        console.log(items)
         for (i = 0; i < items.length; i++) {
             items[i].addEventListener('click', function () {
+                alert('ddddd')
                 that.leftConsole.style.display = "flex";
             })
         }
     },
-    
-    // 点击左侧请求第一级的列表,然后拼接生成第一级的HTML结构
-    firstFloorData: function(url,data){
-        $.ajax({
+
+    // 点击左侧请求每一级的列表,然后拼接生成每一级的HTML结构
+    // http://portal.ebistrategy.com:8030/BigScreen/GetProductList
+    FloorData: function (obj, url, type) {
+        var that = this;
+        this.$.ajax({
             url: url,
             type: 'get',
-            dataType: 'jsonp',
-            data: data,
-            success: function(data){
-                console.log(data);
+            dataType: 'json',
+            success: function (list) {
+                console.log(list);
+                if (list.length != 0) {
+                    var html = ''
+                    if (type == 1) {
+                        html = that.creatFirstFloorHtml(list);
+                    } else if (type == 2) {
+                        html = that.creatSecondFloorHtml(list);
+                    } else if (type == 3) {
+                        html = that.creatThirdFloorHtml(list);
+                    } else if (type == 4) {
+                         html = that.creatFourthFloorHtml(list);
+                         that.showConsole();
+                    }
+                    obj.html(html);
+                    that.treeClick();
+
+                }
+            },
+            error: function () {
+                console.log('loading error...........')
             }
-        })
+        });
+    },
+
+    creatFirstFloorHtml: function (data) {
+        var html = '';
+        for (var i = 0; i < data.length; i++) {
+            html += '<div id="' + data[i].ProductName + '" class="tools-item">';
+            html += '<div class="firstIcon tools-item-title" data-type="' + data[i].ProductType + '" data-id="' + data[i].ID + '">';
+            html += '<i class="iconfont icon-right"></i>';
+            html += '<div class="tools-itemText">' + data[i].ProductName + '</div>';
+            html += '</div>'
+            html += ' <div class="tools-item-content order3 hide" product-id="'+ data[i].ID +'"></div>'//保存一下产品类型id
+            html += '</div>';
+        }
+        return html;
+    },
+    creatSecondFloorHtml: function (data) {
+        var html = '';
+        for (var i = 0; i < data.length; i++) {
+            html += '<div class="tools-content">'
+            html += '<div class="secondIcon tools-content-title" data-id="' + data[i].id + '" title="' + data[i].name + '">'
+            html += '<i class="iconfont icon-right"></i>'
+            html += '<div class="tools-itemText"><span class="iconfont icon-worksheet"></span>' + data[i].name + '</div>'
+            html += '</div>'
+            html += '<div class="tools-contents hide">'
+            html += '</div></div>'
+        }
+        return html;
+    },
+    creatThirdFloorHtml: function (data) {
+        var html = '';
+        for (var i = 0; i < data.length; i++) {
+            html += '<div class="tools-content-list">'
+            html += '<div class="thirdIcon tools-content-list-title" data-app-id="' + data[i].AppId + '" data-id="' + data[i].SheetId + '">'
+            html += '<i class="iconfont icon-right"></i>'
+            html += '<div class="tools-itemText"><span class="iconfont icon-worksheet"></span>' + data[i].Title + '</div>'
+            html += '</div>'
+            html += '<div class="tools-content-list-content hide">'
+            html += '</div></div>'
+        }
+        return html;
+    },
+    creatFourthFloorHtml: function (data) {
+        var html = '';
+        for (var i = 0; i < data.length; i++) {
+            html += '<div class="last-content-item dropElement" data-app-id="'+ data[i].AppId +'" data-id="'+ data[i].SheetId +'" title="'+ data[i].Title +'" data-source-text="'+ data[i].Title +'" draggable="true">'
+            html += '<a href="javascript:;" class="left-control-item" draggable="false"><span class="iconfont icon-datasheet"></span></a>'    
+            html += '<div class="tools-itemText text"><span class="last-text">'+ data[i].Title +'</span></div></div>'        
+        }
+        return html;
     },
 
     openOrClose: function () {
@@ -1220,18 +1259,21 @@ SliderBar.prototype = {
         var menuList = this.Selector.menuList;
         var leftMenu = this.Selector.leftMenu;
         var leftConsole = this.leftConsole;
+        var that = this;
         for (var i = 0; i < sliderItem.length; i++) {
 
             sliderItem[i].addEventListener('click', function () {
-                if(this.classList.contains('active')){
-                    leftMenu.style.width = "0";
+                if (this.classList.contains('active')) {
+                    leftMenu.classList.add('hide');
+                    leftMenu.classList.remove('show');
                     this.classList.remove('active');
                     leftConsole.style.display = "none";
                     return
-                }else {
-                    leftMenu.style.width = "260px";
+                } else {
+                    leftMenu.classList.add('show');
+                    leftMenu.classList.remove('hide');
                 }
-               
+
                 for (var j = 0; j < sliderItem.length; j++) {
                     sliderItem[j].classList.remove('active');
                     menuList[j].classList.remove('show');
@@ -1239,49 +1281,88 @@ SliderBar.prototype = {
                 }
 
                 if (this.classList.contains('qlik')) {
+                    $('.QlikSense-list .tools-tree').html('loading..........')
+
                     this.classList.add('active');
+                    var _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetProductList?PorductType=1");
+
+                    that.FloorData($('.QlikSense-list .tools-tree'), 'DataServer.ashx?uri=' + _Uri, 1);
+
                     menuList[0].classList.add('show');
                     menuList[0].classList.remove('hide');
 
                 } else if (this.classList.contains('tableau')) {
+
                     this.classList.add('active');
+                    // that.FloorData($('.tableau-list .tools-tree'), './js/firstFloor.json', { 'PorductType': 1 }, 1);
                     menuList[1].classList.add('show');
                     menuList[1].classList.remove('hide');
+
                 } else if (this.classList.contains('custom')) {
+
                     this.classList.add('active');
                     menuList[2].classList.add('show');
                     menuList[2].classList.remove('hide');
+
                 }
 
             })
         }
     },
     treeClick: function () {
-        // console.log($('#readFileList .tools-item-title'))
-        $('#QlikSense1 .tools-item-title').on('click', function () {
+        var that = this;
+        var _Uri = '';
+
+        // /BigScreen/GetQlikSenseAppList?
+
+        $('.QlikSense-list .firstIcon').unbind().on('click', function () {
+            var PorductID = $(this).attr('data-id');
+             that.productId = PorductID;
+            $(this).parent().find('.tools-item-content').html('loading..........');
+
+            _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseAppList?PorductID=" + PorductID);
+    
+            that.FloorData($(this).parent().find('.tools-item-content'), 'DataServer.ashx?uri=' + _Uri, 2);
+
             $(this).find('i').toggleClass('icon-down').toggleClass('icon-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
-            $('#QlikSense1').find('.tools-item-content').toggleClass('show').toggleClass('hide');
-        });
-        $('#QlikSense2 .tools-item-title').on('click', function () {
-            $(this).find('i').toggleClass('icon-down').toggleClass('icon-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
-            $('#QlikSense2').find('.tools-item-content').toggleClass('show').toggleClass('hide');
-        });
-        $('#tableau1 .tools-item-title').on('click', function () {
-            $(this).find('i').toggleClass('icon-down').toggleClass('icon-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
-            $('#tableau1').find('.tools-item-content').toggleClass('show').toggleClass('hide');
+            $(this).parent().find('.tools-item-content').toggleClass('show').toggleClass('hide');
         });
 
-        $('.tools-content .tools-content-title').on('click', function () {
+        $('.tools-content .secondIcon').unbind().on('click', function () {
+            $(this).parent().find('.tools-contents').html('loading.........');
+            var PorductID = that.productId;
+            var appId = $(this).attr('data-id');
+            _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseSheetList?PorductID=" + PorductID + "&AppId=" + appId);
+
+            that.FloorData($(this).parent().find('.tools-contents'), 'DataServer.ashx?uri=' + _Uri, 3);
+
             $(this).find('i').toggleClass('icon-down').toggleClass('icon-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
             $(this).parent().find('.tools-contents').toggleClass('show').toggleClass('hide');
         });
+        $('.tools-content-list .thirdIcon').unbind().on('click', function () {
+            // console.log('3333333')
+
+             var PorductID = that.productId;
+             var appId = $(this).attr('data-app-id');
+             var sheetId = $(this).attr('data-id');
+
+            _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseObjectList?PorductID=" + PorductID + "&AppId=" + appId + "&SheetId=" + sheetId);
+
+            that.FloorData($(this).parent().find('.tools-content-list-content'), 'DataServer.ashx?uri=' + _Uri, 4);
+
+            $(this).find('i').toggleClass('icon-down').toggleClass('icon-right');
+            $(this).parent().find('.tools-content-list-content').toggleClass('hide').toggleClass('show');
+            // $(this).parent().find('.tools-contents').toggleClass('show').toggleClass('hide');
+        });
     }
 }
+
 var $ = window.jQuery;
 var leftConsole = document.querySelector('.left-console');
 var sliderItem = document.querySelectorAll('.slider-item');
 var menuList = document.querySelectorAll('.menuList-item');
 var leftMenu = document.querySelector('.left-menu');
+// var dragList = document.querySelectorAll()
 var Selector = {
     sliderItem: sliderItem,
     menuList: menuList,
@@ -1289,3 +1370,40 @@ var Selector = {
 }
 var sliderBar = new SliderBar($, dragList, leftConsole, Selector);
 sliderBar.init();
+
+
+
+
+
+
+
+// 获取样式
+// var getcss = function (ele, key) {
+//     return ele.currentStyle ? ele.currentStyle[key] : document.defaultView.getComputedStyle(ele, false)[key];
+// }
+// 选择器
+// var $ = function (selector) {
+//     if (!selector) { return []; }
+//     var arrEle = [];
+//     if (document.querySelectorAll) {
+//         arrEle = document.querySelectorAll(selector);
+//     } else {
+//         var oAll = document.getElementsByTagName("div"),
+//             lAll = oAll.length;
+//         if (lAll) {
+//             var i = 0;
+//             for (i; i < lAll; i += 1) {
+//                 if (/^\./.test(selector)) {
+//                     if (oAll[i].className === selector.replace(".", "")) {
+//                         arrEle.push(oAll[i]);
+//                     }
+//                 } else if (/^#/.test(selector)) {
+//                     if (oAll[i].id === selector.replace("#", "")) {
+//                         arrEle.push(oAll[i]);
+//                     }
+//                 }
+//             }
+//         }
+//     }
+//     return arrEle;
+// };

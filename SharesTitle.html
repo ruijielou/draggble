@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>股票</title>
+    <style>
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .stockVS2 {
+        padding-left: 10px;
+        padding-right: 10px;
+        min-width: 350px;
+    }
+
+    .stockVS2 .price-content strong {
+        font-size: 54px;
+        line-height: 56px;
+        margin-right: 20px;
+    }
+
+    .stockVS2 .price-content span {
+        font-size: 18px;
+        margin-right: 10px;
+        font-weight: 700;
+        display: block;
+    }
+
+    .stockVS2-title {
+        margin: 0;
+        max-width: 800px;
+    }
+
+    .stockVS2-title a {
+        text-decoration: none;
+        color: #333;
+        margin-right: 15px;
+        font-size: 18px;
+    }
+
+    .stockVS2-title span {
+        color: #92a0ac;
+        font-size: 12px;
+        font-weight: 400;
+    }
+
+    .right-content {
+        display: inline-block;
+        position: relative;
+    }
+
+    .right-content::after {
+        content: ' ';
+        display: block;
+        position: absolute;
+        right: -32px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 16px;
+
+        background-repeat: no-repeat;
+        /*background-position: 0 0;*/
+    }
+
+    .up:after {
+        background-image: url(./img/arrow.png);
+        background-position: 0 0px;
+    }
+
+    .down:after {
+        background-image: url(./img/arrow.png);
+        background-position: 0 -76px;
+    }
+
+    .normal:after {
+        content: '—';
+        background: none;
+        font-size: 20px;
+        color: #000 !important;
+        font-weight: bold;
+    }
+       .red {
+        color: rgb(216, 30, 6);
+    }
+    .green {
+        color: rgb(15, 153, 15);
+    }
+    </style>
+</head>
+
+<body>
+    <div class="stockVS2">
+        <h1 class="stockVS2-title">
+            <a class="name" href="#" >
+            上证指数 
+            </a>
+            <span class="state-time"> 2017-00-00 &nbsp;00:00:00
+            </span>
+        </h1>
+        <div class="price-content">
+            <strong class="price">0.000</strong>
+            <div class="right-content">
+                <span>0.00</span>
+                <span>0.00%</span>
+            </div>
+        </div>
+    </div>
+    <script src="js/jquery-3.2.0.min.js"></script>
+    <script>
+    loading();
+    function loading() {
+        var imglist = [];
+        var _Uri = encodeURIComponent("http://web.juhe.cn:8080/finance/stock/hk?num=02236&key=cc5c021b7ab503a3a32d332a69046021");
+        $.ajax({
+            type: 'get',
+            url: 'DataServer.ashx?uri=' + _Uri,
+            success: function(data) {
+
+                if (data != undefined) {
+                    var datalist = JSON.parse(data)
+                }
+                if (datalist.resultcode != "200") return;
+                var datas = datalist.result[0].data;
+                $('.price').html(datas.formpri);
+                $('.right-content').find('span').eq(0).html(datas.uppic);
+                $('.right-content').find('span').eq(1).html(datas.limit + '%');
+                $('.state-time').html('时间 &nbsp;' + datas.date + ' &nbsp;' + datas.time);
+                $('.stockVS2-title .name').html(datas.name + "(<span class=\"code\">" + datas.gid + "</span>)");
+
+
+                var uppic = datas.uppic;
+                if (uppic > 0) {
+                    $('.right-content').addClass('up').removeClass('down normal');
+                    $('.price-content').addClass('green').removeClass('red');
+                } else if (uppic < 0) {
+                    $('.right-content').removeClass('up normal').addClass('down');
+                    $('.price-content').removeClass('green').addClass('red');
+                } else {
+                    $('.right-content').removeClass('up down').addClass('normal');
+                    $('.price-content').removeClass('green').addClass('red');
+                }
+            },
+            error: function(err) {
+                console.log('loading error');
+            }
+        })
+        setTimeout("loading()", 60000);
+    }
+    </script>
+</body>
+<style>
+    .a{
+        background-color:#ffffff
+    }
+</style>
+</html>

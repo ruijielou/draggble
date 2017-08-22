@@ -1,0 +1,36 @@
+[
+    {
+    "ServerUri": "139.196.146.101",
+    "ServerDomainName": "http://139.196.146.101/",
+    "IsDomainRedirect": true,
+    "DefaultUserDictionary": "IZ0BNP84TKMWRWZ",
+    "VirtualProxy": null,
+    "Certificates": null,
+    "InterfaceBaseUri": null,
+    "CertificateReadMode": 2,
+    "ID": "3f8c01dc-1a40-444a-8a23-b7f5ae3d9b5e",
+    "ProductType": 1,
+    "ProductName": "Qlik Sense111",
+    "Version": "v1",
+    "IsCrackUsersAuthorization": false,
+    "UserName": null,
+    "PassWord": null
+    },
+    {
+        "ServerUri": "139.196.146.101",
+        "ServerDomainName": "http://139.196.146.101/",
+        "IsDomainRedirect": true,
+        "DefaultUserDictionary": "IZ0BNP84TKMWRWZ",
+        "VirtualProxy": null,
+        "Certificates": null,
+        "InterfaceBaseUri": null,
+        "CertificateReadMode": 2,
+        "ID": "3f8c01dc-1a40-444a-8a23-b7f5ae3d9b5a",
+        "ProductType": 1,
+        "ProductName": "Qlik Sense222",
+        "Version": "v1",
+        "IsCrackUsersAuthorization": false,
+        "UserName": null,
+        "PassWord": null
+        }
+    ]

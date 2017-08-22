@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head runat="server">
+    <meta charset="UTF-8">
+    <title></title>
+    <script type="text/javascript" src="http://portal.ebistrategy.com:8060/javascripts/api/tableau-2.1.2.min.js"></script>
+
+</head>
+
+<body>
+
+    <div>
+        <div id="vizContainer" style="width:600px; height:600px;"></div>
+
+    </div>
+<img src="http://portal.ebistrategy.com:8060/views/_2/1_1" alt="">
+<img src="http://portal.ebistrategy.com:8060/views/_2/1_1" alt="">
+</body>
+
+</html>
+<script type="text/javascript">
+initViz();
+    function initViz() {
+        var _doc = document.getElementById("vizContainer");
+        var _url = "http://portal.ebistrategy.com:8060/views/_2/1_1";
+        options = {
+            hideTabs: true,
+            hideToolbar: true,
+            onFirstInteractive: function () {
+                //console.log("Run this code when the viz has finished loading.");
+            }
+        };
+        var viz = new tableau.Viz(_doc, _url, options);
+    }
+    var src = "http://portal.ebistrategy.com:8060/javascripts/api/tableau-2.min.js";
+
+    // loadJs('sid', src, 'script', function () {
+        // debugger
+        // initViz()
+    // })
+
+    function loadJs(sid, jsurl, ele, callback) {
+        try {
+            var nodeHead = document.getElementsByTagName('head')[0];
+            var nodeScript = null;
+            if (document.getElementById(sid) == null) {
+                nodeScript = document.createElement(ele);
+                if (ele == 'script') {
+                    nodeScript.setAttribute('type', 'text/javascript');
+                    nodeScript.setAttribute('src', jsurl);
+                } else if (ele == 'link') {
+                    nodeScript.setAttribute('rel', 'stylesheet');
+                    nodeScript.setAttribute('href', jsurl);
+                }
+
+                nodeScript.setAttribute('id', sid);
+
+                if (callback != null) {
+                    nodeScript.onload = nodeScript.onreadystatechange = function () {
+                        if (nodeScript.ready) {
+                            return false;
+                        }
+                        if (!nodeScript.readyState || nodeScript.readyState == 'complete') {
+                            nodeScript.ready = true;
+                            callback();
+                        }
+                    };
+                }
+                if (ele == '')
+                    nodeHead.appendChild(nodeScript);
+            } else {
+                if (callback != null) {
+                    callback();
+                }
+            }
+        } catch (e) {
+            alert("错误了" + e);
+        }
+
+    }
+
+</script>

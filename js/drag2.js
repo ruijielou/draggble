@@ -1,6 +1,13 @@
 'use strict'
+// 统一全局变量的类型ID
+var productId = '';
+var ServerDomainName = '';
+var clickSliderType = '';
+var qlikAppId = '';
+var qlikObjId = '';
 
 function MyDrag(targetBox, line, dragList, showState1, showState2, mask) {
+    this.$ = $;
     this.targetBoxobj = targetBox; //目标对象
     this.dragList = dragList; //拖拽对象
     this.showState1 = showState1; //当拖拽区域列表为空的时候显示的状态栏
@@ -24,6 +31,8 @@ function MyDrag(targetBox, line, dragList, showState1, showState2, mask) {
     this.parentWidth = 0;
     this.creatMask = '';
     this.stopDragMask = ''; //生成的元素进行拖拽时的遮罩层
+    // this.qlikAppId = '';
+    // this.qlikObjId = '';
 }
 MyDrag.prototype = {
     init: function () {
@@ -73,7 +82,7 @@ MyDrag.prototype = {
     },
 
     drag: function () {
-        var i, len = dragList.length;
+        var i, len = this.dragList.length;
         var that = this;
         for (i = 0; i < len; i++) {
             this.dragList[i].onselectstart = function () {
@@ -81,6 +90,8 @@ MyDrag.prototype = {
             };
 
             this.dragList[i].addEventListener('dragstart', function (e) {
+
+
                 that.dragstart(that, this, e)
             });
 
@@ -89,8 +100,9 @@ MyDrag.prototype = {
                 // ev.dataTransfer.clearData("sourceId");
 
                 that.showState2.style.display = "none";
-
-                that.creatMask.classList.remove('active');
+                if (that.creatMask) {
+                    that.creatMask.classList.remove('active');
+                }
 
             };
         }
@@ -115,9 +127,9 @@ MyDrag.prototype = {
             that.dragover(that, this, e);
             return true
         });
-        this.showState2.addEventListener('drop', function (e) {
+        this.showState2.ondrop = function (e) {
             that.drop(that, this, e);
-        });
+        };
         this.showState2.addEventListener('dragenter', function (e) {
             that.dragenter(this);
         });
@@ -132,11 +144,20 @@ MyDrag.prototype = {
     },
 
     dragstart: function (that, obj, e) {
+
         var e = window.event || e;
         var sourceText = obj.dataset['sourceText'];
+        var qlikObjId = obj.dataset['id'];
+        var qlikAppId = obj.dataset['appId'];
+        // console.log(sourceText);
+        qlikAppId = obj.dataset['appId'];
+        qlikObjId = obj.dataset['id'];
+        // console.log(qlikAppId);
+        // console.log(qlikObjId);
 
         that.eleDrag = obj;
-        e.dataTransfer.setData('source', sourceText);
+        var sourceObj = JSON.stringify({ 'sourceText': sourceText, 'sourceId': qlikObjId, 'sourceAppId': qlikAppId })
+        e.dataTransfer.setData('source', sourceObj);
     },
 
     dragover: function (that, obj, e) {
@@ -389,6 +410,8 @@ MyDrag.prototype = {
     // 2.图形拖拽的时候的拖放
     //
     drop: function (that, obj, e) {
+
+
         var eleDragParent = null;
         var ifCreatParetn = true;
         var isIconOrImg = false;
@@ -403,7 +426,14 @@ MyDrag.prototype = {
         var parentNodes = '',
             html = '',
             placeHtml = '',
-            str = e.dataTransfer.getData('source');
+
+            sourceStr = '',
+
+            sourceObj = '',
+
+            sourceAppId = '',
+            sourceId = '',
+            str = '';
 
         if (that.eleDrag && that.eleDrag.classList.contains('content-menu')) {
             isIconOrImg = true; //用一个变量保存当前是左侧元素还是图形元素的释放
@@ -422,7 +452,14 @@ MyDrag.prototype = {
             }
         } else {
             // 如果是左侧tab栏拖拽过来的就创建新元素
-            html = str == "" ? this.creatHtml() : this.creatHtml(str);
+            var sourceStr = e.dataTransfer.getData('source');
+
+            var sourceObj = JSON.parse(sourceStr);
+
+            var sourceAppId = sourceObj.sourceAppId;
+            var sourceId = sourceObj.sourceId;
+            var str = sourceObj.sourceText;
+            html = str == "" ? this.creatHtml(e, sourceAppId, sourceId) : this.creatHtml(e, sourceAppId, sourceId, str);
         }
         // 如果当前是空白的第一次拖过来的内容
         // 需要生成一个父级，和右边空白区域的容器
@@ -443,7 +480,7 @@ MyDrag.prototype = {
             // this.addEvent(html);
 
             // 创建空白区域的占位控件
-            placeHtml = this.creatHtml('空白区域');
+            placeHtml = this.creatHtml(e, sourceAppId, sourceId, '空白区域');
 
             placeHtml.style.top = "calc(" + that.dropTargetTop + '% + 2px)';
             placeHtml.style.left = "calc(" + that.dropTargetLeft + '% + 2px)';
@@ -526,18 +563,11 @@ MyDrag.prototype = {
                 target.style.width = 'calc(100% - 2px)';
                 target.style.height = 'calc(50% - 2px)';
             } else if (that.dragDir == 'middle') {
-                // var parentList = document.querySelectorAll('.parentList');
-                // if (content.length == 2) {
-                //     html.style.left = 'calc(0% + 2px)';
-                //     html.style.top = 'calc(0% + 2px)';
-                //     html.style.width = 'calc(100% - 2px)';
-                //     html.style.height = 'calc(100% - 2px)';
-                // } else {
+
                 html.style.left = target.style.left;
                 html.style.top = target.style.top;
                 html.style.width = target.style.width;
                 html.style.height = target.style.height;
-                // }
 
             }
 
@@ -626,6 +656,7 @@ MyDrag.prototype = {
                     }
 
                 }
+
             }
 
         }
@@ -635,9 +666,165 @@ MyDrag.prototype = {
         for (var i = 0; i < mask.length; i++) {
             mask[i].parentNode.removeChild(mask[i]);
         }
-        // debugger
+
+        // var qlikAppId = qlikAppId;
+        // var qlikObjId = this.qlikObjId;
+        if (sourceAppId && sourceId) {
+            if (clickSliderType == 'qlik') {
+                var getQlikCssLen = $('#getQlikCss').length;
+                var getQlikScriptLen = $('#getQlikScript').length;
+
+                var qlikTicket = '';
+                var _Uri = '';
+                if (getQlikCssLen == 0 && getQlikScriptLen == 0) {
+
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseTicket?PorductID=" + productId);
+
+                    // _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetTableauTicket?PorductID=" + productId + '&SiteId=' + qlikAppId);
+
+                    $.ajax({
+                        url: 'DataServer.ashx?uri=' + _Uri,
+                        async: false,
+                        type: 'get',
+                        success: function (data) {
+                            qlikTicket = data;
+                        }
+                    })
+                }
+                var href = ServerDomainName + 'resources/autogenerated/qlik-styles.css?qlikTicket=' + qlikTicket;
+                var src = ServerDomainName + 'resources/assets/external/requirejs/require.js';
+
+
+                loadJs('getQlikCss', href, 'link', function () {
+                    loadJs('getQlikScript', src, 'script', function () {
+                        getQlik(sourceAppId, sourceId)
+                    });
+                })
+            } else if (clickSliderType == 'tableau') {
+
+                var tableauSrc = '';
+                var _Uri = '';
+
+                _Uri = encodeURIComponent('http://portal.ebistrategy.com:8030/BigScreen/GetTableauUri?PorductId=' + productId + '&SiteId=' + sourceAppId + '&ViewUrl=' + sourceId + '&Type=1');
+                if (_Uri) {
+                    $.ajax({
+                        url: 'DataServer.ashx?uri=' + _Uri,
+                        async: false,
+                        type: 'get',
+                        success: function (data) {
+                            console.log(data);
+                            tableauSrc = data;
+                        }
+                    })
+                }
+
+                var url = tableauSrc;
+
+                var iframe = $('<iframe class="tableauIframe" src="' + url + '" width="100%" height="100%"></iframe>');
+
+                var id = document.getElementById(sourceId);
+
+                $(id).html(iframe);
+                // $(".tableauIframe").contents().find("img").css({'width': '100%', 'height': '100%'});
+
+            }
+        }
+
+        function getTableau(id, url) {
+            var _doc = document.getElementById(id);
+            console.log(_doc)
+            // var _url = "http://portal.ebistrategy.com:8060/trusted/rLIueCdcRHiirvCu2BKTOg==:jva7hJC_1-EdFd5UrygKVk_T/views/_1/sheet2";
+            var options = {
+                hideTabs: true,
+                hideToolbar: true,
+                onFirstInteractive: function () {
+                    // 图行加载完成后的回调
+                    // alert('end')
+                }
+            };
+            // var aaa = new Tableau();
+            new tableau.Viz(_doc, url, options);
+        }
+
+        // ServerDomainName = ServerDomainName.substring(0, ServerDomainName.length -1);
+        function getQlik(qlikAppId, qlikObjId) {
+            var config = {
+                host: '139.196.146.101',
+                prefix: '/',
+                port: 80,
+                isSecure: false
+            };
+
+            require.config({
+                baseUrl: (config.isSecure ? "https://" : "http://") + config.host + (config.port ? ":" + config.port : "") + config.prefix + "resources"
+            });
+
+            var qlikApps = [];
+            var _Qlik;
+            var appId = qlikAppId;
+            var objId = qlikObjId;
+
+            require(["js/qlik"], function (qlik) {
+                // console.log(qlik)
+                _Qlik = qlik;
+                qlik.setOnError(function (error) {
+                    alert(error.message);
+                });
+
+                function setSenseObject(appid, objid, eventid, _Qlik) {
+
+                    var _app = _Qlik.openApp(appid, config);
+                    _app.getObject(eventid, objid, { noInteraction: true });
+                }
+
+                setSenseObject(appId, objId, objId, qlik);
+            });
+
+        }
+
+        function loadJs(sid, jsurl, ele, callback) {
+            try {
+                var nodeHead = document.getElementsByTagName('head')[0];
+                var nodeScript = null;
+                if (document.getElementById(sid) == null) {
+                    nodeScript = document.createElement(ele);
+                    if (ele == 'script') {
+                        nodeScript.setAttribute('type', 'text/javascript');
+                        nodeScript.setAttribute('src', jsurl);
+                    } else if (ele == 'link') {
+                        nodeScript.setAttribute('rel', 'stylesheet');
+                        nodeScript.setAttribute('href', jsurl);
+                    }
+
+                    nodeScript.setAttribute('id', sid);
+                    nodeHead.appendChild(nodeScript);
+
+                    if (callback != null) {
+                        nodeScript.onload = nodeScript.onreadystatechange = function () {
+                            if (nodeScript.ready) {
+                                return false;
+                            }
+                            if (!nodeScript.readyState || nodeScript.readyState == 'complete') {
+                                nodeScript.ready = true;
+                                callback();
+                            }
+                        };
+                    }
+
+                } else {
+                    if (callback != null) {
+                        callback();
+                    }
+                }
+            } catch (e) {
+                alert("错误了" + e);
+            }
+
+        }
+        this.showState2.style.display = 'none';
+
     },
-    // 添加事件模式
+    // 添加事件函数
     addEvent: function (html) {
         var that = this;
         this.onClickStyle(html);
@@ -674,13 +861,14 @@ MyDrag.prototype = {
         //     that.drop(that, this, e);
 
         // }, false);
+
         html.ondrop = function (e) {
             that.drop(that, this, e);
         }
     },
 
     // 添加生成每个图形的代码结构
-    creatHtml: function (str) {
+    creatHtml: function (e, sourceAppId, sourceId, str) {
 
         var that = this,
             html = '',
@@ -695,6 +883,7 @@ MyDrag.prototype = {
             bottomLine = '',
             deletes = '',
             draglogo = '',
+            qlikEmbed = '',
             listContent = '';
 
         html = document.createElement('div');
@@ -766,9 +955,20 @@ MyDrag.prototype = {
         header = document.createElement('div');
         listContent = document.createElement('div');
         header.classList.add('header');
-        header.innerHTML = "单击添加标题";
+        // header.innerHTML = "单击添加标题";
         listContent.classList.add('list-content');
-        listContent.innerHTML = "内容区域";
+
+        // listContent.innerHTML = "内容区域";
+        qlikEmbed = document.createElement('div');
+        qlikEmbed.style.width = 'calc(100% - 4px)';
+        qlikEmbed.style.height = 'calc(100% - 4px)';
+
+        qlikEmbed.id = sourceId;
+        qlikEmbed.dataset.qlikAppId = sourceAppId;
+        qlikEmbed.dataset.qlikObjId = sourceId;
+
+        listContent.appendChild(qlikEmbed);
+
         html.appendChild(header);
         html.appendChild(listContent);
         html.classList.add('content-menu');
@@ -778,10 +978,6 @@ MyDrag.prototype = {
         html.style.height = 'calc(' + that.creatMask.style.height + ' - 2px)';
         html.setAttribute('draggable', "draggable");
 
-        //var str = e.dataTransfer.getData('source');
-        if (str) {
-            listContent.innerHTML = str;
-        }
         return html;
     },
 
@@ -1086,32 +1282,6 @@ MyDrag.prototype = {
 
     },
 
-    // moveLeft: function(moveDown, source) {
-    //     moveDown.on('mousedown', function(event) {
-    //         var e = event || window.event;
-    //         $(this).css('cursor', 'move');
-    //         var x = parseInt(e.pageX);
-    //         var y = parseInt(e.pageY);
-    //         var left = parseInt(source.css('left'));
-    //         var top = parseInt(source.css('top'));
-    //         $(document).bind('mousemove', function(ev) {
-    //             var ev = ev || window.event;
-    //             var nowX = parseInt(ev.pageX);
-    //             var nowY = parseInt(ev.pageY);
-    //             var initX = nowX - x + left;
-    //             var initY = nowY - y + top;
-    //             source.css({
-    //                 'left': initX,
-    //                 'top': initY
-    //             });
-    //         })
-    //     });
-    //     $(document).bind('mouseup', function() {
-    //         moveDown.css('cursor', 'default');
-
-    //         $(document).unbind('mousemove');
-    //     });
-    // }
     // 判断拖拉的方向
     getDirection: function (el) {
         var xPos, yPos, offset, dir;
@@ -1129,52 +1299,79 @@ MyDrag.prototype = {
 
 
 
-
-
-
-
-var targetbox = document.querySelector('.right-content');
-var dragList = document.querySelectorAll('.dropElement');
-var lines = document.querySelector('.lines')
-var showState1 = document.querySelector('.showState1');
-var showState2 = document.querySelector('.showState2');
-var mask = document.querySelector('.mask');
-
-var mydrag = new MyDrag(targetbox, lines, dragList, showState1, showState2, mask);
-mydrag.init();
-
-
-
-
-
-function SliderBar($, items, leftConsole, Selector) {
+function SliderBar($, leftConsole, Selector) {
     this.$ = $;
-    this.items = items;
     this.leftConsole = leftConsole;
     this.Selector = Selector;
-    this.productId = '';
+    // this.productId = '';
+    this.dropElement = null;
+    this.clickSliderType = '';
 }
+
 SliderBar.prototype = {
+
     init: function () {
-        this.showConsole();
         this.openOrClose();
-        this.treeClick();
+        // this.treeClick();
     },
+
+    ondrops: function () {
+        var dragList = this.dropElement;
+        var $ = this.$;
+        // console.log(dragList)
+        var mydrag = new MyDrag(targetbox, lines, dragList, showState1, showState2, mask);
+        mydrag.drag();
+    },
+
     showConsole: function () {
         var i, that = this;
-        var items = document.querySelectorAll('.dropElement');
-        console.log(items)
+        var items = this.dropElement;
+        var loading = this.leftConsole.querySelector('.icons-loading');
+
         for (i = 0; i < items.length; i++) {
-            items[i].addEventListener('click', function () {
-                alert('ddddd')
-                that.leftConsole.style.display = "flex";
+            $(items[i]).unbind().on('click', function () {
+                loading.style.display = "inline";
+                that.Selector.iframe.src = '';
+                that.Selector.iframe.style.display = 'none';
+                for (var j = 0; j < items.length; j++) {
+                    items[j].classList.remove('active');
+                }
+                this.classList.add('active');
+                var ObjectId = this.dataset['id'];
+                var AppId = this.dataset['appId'];
+                var PorductID = productId;
+
+                if (that.clickSliderType == 'qlik') {
+
+                    var _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetSingleUri?PorductID=" + PorductID + "&AppId=" + AppId + "&ObjectId=" + ObjectId);
+
+                } else if (that.clickSliderType == 'tableau') {
+
+                    var _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetTableauUri?PorductID=" + PorductID + "&SiteId=" + AppId + "&ViewUrl=" + ObjectId);
+
+                }
+                if (_Uri) {
+                    that.$.ajax({
+                        url: 'DataServer.ashx?uri=' + _Uri,
+                        type: 'get',
+                        success: function (list) {
+                            console.log(list);
+                            that.leftConsole.style.display = "flex";
+                            that.Selector.iframe.src = list;
+                            that.Selector.iframe.onload = function () {
+                                this.style.display = '';
+                                that.leftConsole.querySelector('.icons-loading').style.display = "none";
+                            }
+                        }
+                    })
+                }
             })
         }
     },
 
     // 点击左侧请求每一级的列表,然后拼接生成每一级的HTML结构
     // http://portal.ebistrategy.com:8030/BigScreen/GetProductList
-    FloorData: function (obj, url, type) {
+    FloorData: function (obj, url, type, appId) {
         var that = this;
         this.$.ajax({
             url: url,
@@ -1184,73 +1381,165 @@ SliderBar.prototype = {
                 console.log(list);
                 if (list.length != 0) {
                     var html = ''
-                    if (type == 1) {
-                        html = that.creatFirstFloorHtml(list);
-                    } else if (type == 2) {
-                        html = that.creatSecondFloorHtml(list);
-                    } else if (type == 3) {
-                        html = that.creatThirdFloorHtml(list);
-                    } else if (type == 4) {
-                         html = that.creatFourthFloorHtml(list);
-                         that.showConsole();
-                    }
-                    obj.html(html);
-                    that.treeClick();
+                    var clickObj = null;
 
+                    if (type == 1) {
+
+                        html = that.creatFirstFloorHtml(list);
+                        obj.html(html);
+                        if(that.clickSliderType == 'qlik'){
+                            that.clickFirstFn($('.QlikSense-list .firstIcon'));
+                        }else if(that.clickSliderType = 'tableau') {
+                            that.clickFirstFn($('.tableau-list .firstIcon'));
+                        }
+                       
+
+                    } else if (type == 2) {
+
+                        html = that.creatSecondFloorHtml(list);
+                        obj.html(html);
+
+                        if(that.clickSliderType == 'qlik'){
+                            that.clickSecondFn($('.QlikSense-list .secondIcon'));
+                        }else if(that.clickSliderType = 'tableau') {
+                            that.clickSecondFn($('.tableau-list .secondIcon'));
+                        }
+
+                        // that.clickSecondFn($('.secondIcon'));
+
+                    } else if (type == 3) {
+
+                        html = that.creatThirdFloorHtml(list);
+                        obj.html(html);
+                        // that.clickThirdFn($('.thirdIcon'));
+                        if(that.clickSliderType == 'qlik'){
+                            that.clickThirdFn($('.QlikSense-list .thirdIcon'));
+                        }else if(that.clickSliderType = 'tableau') {
+                            that.clickThirdFn($('.tableau-list .thirdIcon'));
+                        }
+
+                    } else if (type == 4) {
+                        if (appId) {
+                            html = that.creatFourthFloorHtml(list, appId);
+                        } else {
+                            html = that.creatFourthFloorHtml(list);
+                        }
+
+                        obj.html(html);
+                        var items = document.querySelectorAll('.dropElement');
+                        // console.log(items)
+                        that.dropElement = items;
+                        that.showConsole();
+                        that.ondrops();
+                    }
+                    // if(that.clickSliderType == 'qlik') {
+                    //     that.treeClick($('.QlikSense-list .firstIcon'), $('.QlikSense-list .secondIcon'), $('.QlikSense-list .thirdIcon'));
+                    // }else if (that.clickSliderType == 'tableau') {
+                    //     that.treeClick($('.tableau-list .firstIcon'), $('.tableau-list .secondIcon'), $('.tableau-list .thirdIcon'));
+                        
+                    // }
+                    
+
+                } else if (list.length == 0) {
+                    obj.html('没有找到数据');
                 }
             },
             error: function () {
-                console.log('loading error...........')
+                obj.html('请求错误');
             }
         });
+
     },
 
     creatFirstFloorHtml: function (data) {
         var html = '';
         for (var i = 0; i < data.length; i++) {
             html += '<div id="' + data[i].ProductName + '" class="tools-item">';
-            html += '<div class="firstIcon tools-item-title" data-type="' + data[i].ProductType + '" data-id="' + data[i].ID + '">';
-            html += '<i class="iconfont icon-right"></i>';
+            html += '<div class="firstIcon tools-item-title" data-server="' + data[i].ServerDomainName + '" data-type="' + data[i].ProductType + '" data-id="' + data[i].ID + '">';
+            html += '<i class="iconfont icons-right"></i>';
             html += '<div class="tools-itemText">' + data[i].ProductName + '</div>';
             html += '</div>'
-            html += ' <div class="tools-item-content order3 hide" product-id="'+ data[i].ID +'"></div>'//保存一下产品类型id
+            html += ' <div class="tools-item-content order3 hide" product-id="' + data[i].ID + '"></div>'//保存一下产品类型id
             html += '</div>';
         }
         return html;
     },
     creatSecondFloorHtml: function (data) {
         var html = '';
-        for (var i = 0; i < data.length; i++) {
-            html += '<div class="tools-content">'
-            html += '<div class="secondIcon tools-content-title" data-id="' + data[i].id + '" title="' + data[i].name + '">'
-            html += '<i class="iconfont icon-right"></i>'
-            html += '<div class="tools-itemText"><span class="iconfont icon-worksheet"></span>' + data[i].name + '</div>'
-            html += '</div>'
-            html += '<div class="tools-contents hide">'
-            html += '</div></div>'
+        var i;
+        if (this.clickSliderType == 'qlik') {
+            for (i = 0; i < data.length; i++) {
+
+                html += '<div class="tools-content">'
+                html += '<div class="secondIcon tools-content-title" data-id="' + data[i].id + '" title="' + data[i].name + '">'
+                html += '<i class="iconfont icons-right"></i>'
+                html += '<div class="tools-itemText"><span class="iconfont icons-worksheet"></span>' + data[i].name + '</div>'
+                html += '</div>'
+                html += '<div class="tools-contents hide">'
+                html += '</div></div>'
+            }
+        } else if (this.clickSliderType == 'tableau') {
+            var sites = data.sites;
+            // console.log(sites);
+            for (i = 0; i < sites.length; i++) {
+                html += '<div class="tools-content">'
+                html += '<div class="secondIcon tools-content-title" data-id="' + sites[i].id + '" title="' + sites[i].name + '">'
+                html += '<i class="iconfont icons-right"></i>'
+                html += '<div class="tools-itemText"><span class="iconfont icons-worksheet"></span>' + sites[i].name + '</div>'
+                html += '</div>'
+                html += '<div class="tools-contents hide">'
+                html += '</div></div>'
+            }
         }
         return html;
     },
-    creatThirdFloorHtml: function (data) {
+    creatThirdFloorHtml: function (data, ) {
         var html = '';
-        for (var i = 0; i < data.length; i++) {
-            html += '<div class="tools-content-list">'
-            html += '<div class="thirdIcon tools-content-list-title" data-app-id="' + data[i].AppId + '" data-id="' + data[i].SheetId + '">'
-            html += '<i class="iconfont icon-right"></i>'
-            html += '<div class="tools-itemText"><span class="iconfont icon-worksheet"></span>' + data[i].Title + '</div>'
-            html += '</div>'
-            html += '<div class="tools-content-list-content hide">'
-            html += '</div></div>'
+        var i;
+        if (this.clickSliderType == 'qlik') {
+            for (i = 0; i < data.length; i++) {
+                html += '<div class="tools-content-list">'
+                html += '<div class="thirdIcon tools-content-list-title" data-app-id="' + data[i].AppId + '" data-id="' + data[i].SheetId + '">'
+                html += '<i class="iconfont icons-right"></i>'
+                html += '<div class="tools-itemText"><span class="iconfont icons-worksheet"></span>' + data[i].Title + '</div>'
+                html += '</div>'
+                html += '<div class="tools-content-list-content hide">'
+                html += '</div></div>'
+            }
+        } else if (this.clickSliderType == 'tableau') {
+            var workBooks = data.workbooks;
+            if (workBooks.length == 0) return html;
+            for (i = 0; i < workBooks.length; i++) {
+                html += '<div class="tools-content-list">'
+                html += '<div class="thirdIcon tools-content-list-title" data-app-id="' + workBooks[i].id + '" data-id="' + workBooks[i].id + '">'
+                html += '<i class="iconfont icons-right"></i>'
+                html += '<div class="tools-itemText"><span class="iconfont icons-worksheet"></span>' + workBooks[i].name + '</div>'
+                html += '</div>'
+                html += '<div class="tools-content-list-content hide">'
+                html += '</div></div>'
+            }
         }
+
         return html;
     },
-    creatFourthFloorHtml: function (data) {
+    creatFourthFloorHtml: function (data, workBooksId) {
         var html = '';
-        for (var i = 0; i < data.length; i++) {
-            html += '<div class="last-content-item dropElement" data-app-id="'+ data[i].AppId +'" data-id="'+ data[i].SheetId +'" title="'+ data[i].Title +'" data-source-text="'+ data[i].Title +'" draggable="true">'
-            html += '<a href="javascript:;" class="left-control-item" draggable="false"><span class="iconfont icon-datasheet"></span></a>'    
-            html += '<div class="tools-itemText text"><span class="last-text">'+ data[i].Title +'</span></div></div>'        
+        var i;
+        if (this.clickSliderType == 'qlik') {
+            for (i = 0; i < data.length; i++) {
+                html += '<div class="last-content-item dropElement" data-app-id="' + data[i].AppId + '" data-id="' + data[i].Name + '" title="' + data[i].Title + '" data-source-text="' + data[i].Title + '" draggable="true">'
+                html += '<a href="javascript:;" class="left-control-item" draggable="false"><span class="iconfont icons-datasheet" draggable="false"></span></a>'
+                html += '<div class="tools-itemText text" draggable="false"><span class="last-text" draggable="false">' + data[i].Title + '</span></div></div>'
+            }
+        } else if (this.clickSliderType == 'tableau') {
+            var view = data.views;
+            for (i = 0; i < view.length; i++) {
+                html += '<div class="last-content-item dropElement" data-app-id="' + workBooksId + '" data-id="' + view[i].contentUrl + '" title="' + view[i].name + '" data-source-text="' + view[i].name + '" draggable="true">'
+                html += '<a href="javascript:;" class="left-control-item" draggable="false"><span class="iconfont icons-datasheet" draggable="false"></span></a>'
+                html += '<div class="tools-itemText text" draggable="false"><span class="last-text" draggable="false">' + view[i].name + '</span></div></div>'
+            }
         }
+
         return html;
     },
 
@@ -1260,118 +1549,376 @@ SliderBar.prototype = {
         var leftMenu = this.Selector.leftMenu;
         var leftConsole = this.leftConsole;
         var that = this;
+        var j;
         for (var i = 0; i < sliderItem.length; i++) {
 
-            sliderItem[i].addEventListener('click', function () {
+            $(sliderItem[i]).unbind().on('click', function () {
+
                 if (this.classList.contains('active')) {
                     leftMenu.classList.add('hide');
-                    leftMenu.classList.remove('show');
+                    leftMenu.classList.remove('flex');
                     this.classList.remove('active');
-                    leftConsole.style.display = "none";
+
                     return
                 } else {
-                    leftMenu.classList.add('show');
+                    leftMenu.classList.add('flex');
                     leftMenu.classList.remove('hide');
                 }
 
-                for (var j = 0; j < sliderItem.length; j++) {
+                leftConsole.style.display = "none";
+
+                for (j = 0; j < sliderItem.length; j++) {
                     sliderItem[j].classList.remove('active');
-                    menuList[j].classList.remove('show');
+                    menuList[j].classList.remove('flex');
                     menuList[j].classList.add('hide');
+
+                    // tools-content-list-content 
+                    // 把最里层的数据折叠起来
+                    $(menuList[j]).find('.tools-content-list-content').removeClass('show').addClass('hide');
+                    // 折叠第三层
+                    $(menuList[j]).find('.tools-contents').removeClass('show').addClass('hide');
+                    // 折叠第二层
+                    $(menuList[j]).find('.tools-item-content').removeClass('show').addClass('hide');
+                    $(menuList[j]).find('.firstIcon').find('i').removeClass('icons-down').addClass('icons-right');
+                    $(menuList[j]).find('.secondIcon').find('i').removeClass('icons-down').addClass('icons-right');
+                    $(menuList[j]).find('.thirdIcon').find('i').removeClass('icons-down').addClass('icons-right');
                 }
 
+
                 if (this.classList.contains('qlik')) {
-                    $('.QlikSense-list .tools-tree').html('loading..........')
+                    that.clickSliderType = 'qlik';
 
+                    var len = $('.QlikSense-list .tools-item').length;
                     this.classList.add('active');
-                    var _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetProductList?PorductType=1");
+                    if (len == 0) {
 
-                    that.FloorData($('.QlikSense-list .tools-tree'), 'DataServer.ashx?uri=' + _Uri, 1);
+                        $('.QlikSense-list .tools-tree').html('loading<i class="iconfont icons-loading"></i>')
 
-                    menuList[0].classList.add('show');
+                        var _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetProductList?PorductType=1");
+
+                        that.FloorData($('.QlikSense-list .tools-tree'), 'DataServer.ashx?uri=' + _Uri, 1);
+
+                    }
+                    menuList[0].classList.add('flex');
                     menuList[0].classList.remove('hide');
 
                 } else if (this.classList.contains('tableau')) {
 
+                    that.clickSliderType = 'tableau';
+
                     this.classList.add('active');
-                    // that.FloorData($('.tableau-list .tools-tree'), './js/firstFloor.json', { 'PorductType': 1 }, 1);
-                    menuList[1].classList.add('show');
+
+                    var len = $('.tableau-list .tools-item').length;
+                    if (len == 0) {
+
+                        $('.tableau-list .tools-tree').html('loading<i class="iconfont icons-loading"></i>')
+
+                        var _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetProductList?PorductType=3");
+
+                        that.FloorData($('.tableau-list .tools-tree'), 'DataServer.ashx?uri=' + _Uri, 1);
+                    }
+
+                    menuList[1].classList.add('felx');
                     menuList[1].classList.remove('hide');
 
                 } else if (this.classList.contains('custom')) {
-
+                    that.clickSliderType = 'custom';
                     this.classList.add('active');
                     menuList[2].classList.add('show');
                     menuList[2].classList.remove('hide');
 
                 }
+                clickSliderType = that.clickSliderType;
 
             })
         }
     },
-    treeClick: function () {
+
+    clickFirstFn: function (firstBtn) {
         var that = this;
         var _Uri = '';
-
-        // /BigScreen/GetQlikSenseAppList?
-
-        $('.QlikSense-list .firstIcon').unbind().on('click', function () {
+        firstBtn.unbind().on('click', function () {
+            alert('ddddddddd')
+            var status = $(this).find('i').hasClass('icons-down');
+            var len = $(this).parent().find('.tools-item-content').find('.tools-content').length;
             var PorductID = $(this).attr('data-id');
-             that.productId = PorductID;
-            $(this).parent().find('.tools-item-content').html('loading..........');
+            productId = PorductID;
+            if (len == 0 && !status) {
 
-            _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseAppList?PorductID=" + PorductID);
-    
-            that.FloorData($(this).parent().find('.tools-item-content'), 'DataServer.ashx?uri=' + _Uri, 2);
+                ServerDomainName = $(this).attr('data-server');
+                $(this).parent().find('.tools-item-content').html('loading<i class="iconfont icons-loading"></i>');
+                if (that.clickSliderType == 'qlik') {
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseAppList?PorductID=" + PorductID);
+                } else if (that.clickSliderType == 'tableau') {
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetTableauSiteList?PorductID=" + PorductID);
+                }
 
-            $(this).find('i').toggleClass('icon-down').toggleClass('icon-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+                that.FloorData($(this).parent().find('.tools-item-content'), 'DataServer.ashx?uri=' + _Uri, 2);
+
+            }
+
+            $(this).find('i').toggleClass('icons-down').toggleClass('icons-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
             $(this).parent().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+            $(this).parent().siblings().find('.tools-item-content').removeClass('show').addClass('hide');
+            $(this).parent().siblings().find('.firstIcon').find('i').removeClass('icons-down').addClass('icons-right').stop().find('.tools-item-content').removeClass('show').addClass('hide');
+            return false
         });
+    },
+    clickSecondFn: function (secondBtn) {
+        var that = this;
+        var _Uri = '';
+        secondBtn.unbind().on('click', function () {
+            var status = $(this).find('i').hasClass('icons-down');
+            var len = $(this).parent().find('.tools-contents').find('.tools-content-list').length;
 
-        $('.tools-content .secondIcon').unbind().on('click', function () {
-            $(this).parent().find('.tools-contents').html('loading.........');
-            var PorductID = that.productId;
+            var PorductID = productId;
             var appId = $(this).attr('data-id');
-            _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseSheetList?PorductID=" + PorductID + "&AppId=" + appId);
 
-            that.FloorData($(this).parent().find('.tools-contents'), 'DataServer.ashx?uri=' + _Uri, 3);
 
-            $(this).find('i').toggleClass('icon-down').toggleClass('icon-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+            if (!status && len == 0) {
+                $(this).parent().find('.tools-contents').html('loading<i class="iconfont icons-loading"></i>');
+
+                if (that.clickSliderType == 'qlik') {
+
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseSheetList?PorductID=" + PorductID + "&AppId=" + appId);
+
+                } else if (that.clickSliderType == 'tableau') {
+
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetTableauWorkBooks?PorductID=" + PorductID + "&SiteId=" + appId);
+                }
+
+                that.FloorData($(this).parent().find('.tools-contents'), 'DataServer.ashx?uri=' + _Uri, 3);
+            }
+
+            $(this).find('i').toggleClass('icons-down').toggleClass('icons-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
             $(this).parent().find('.tools-contents').toggleClass('show').toggleClass('hide');
+            // 打开当前折叠其他的
+            // $(this).parent().siblings().find('.tools-contents').removeClass('show').addClass('hide');
+            // $(this).parent().siblings().find('.secondIcon').find('i').removeClass('icons-down').addClass('icons-right').stop().find('.tools-item-content').removeClass('show').addClass('hide');
         });
-        $('.tools-content-list .thirdIcon').unbind().on('click', function () {
-            // console.log('3333333')
+    },
+    clickThirdFn: function (thirdBtn) {
+        var that = this;
+        var _Uri = '';
+        thirdBtn.unbind().on('click', function () {
 
-             var PorductID = that.productId;
-             var appId = $(this).attr('data-app-id');
-             var sheetId = $(this).attr('data-id');
+            var status = $(this).find('i').hasClass('icons-down');
+            var len = $(this).parent().find('.tools-content-list-content').find('.last-content-item').length;
+            var PorductID = productId;
+            var appId = $(this).parent().parent().parent().find('.secondIcon').attr('data-id');
+            var sheetId = $(this).attr('data-id');
 
-            _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseObjectList?PorductID=" + PorductID + "&AppId=" + appId + "&SheetId=" + sheetId);
+            if (!status && len == 0) {
+                $(this).parent().find('.tools-content-list-content').html('loading<i class="iconfont icons-loading"></i>')
 
-            that.FloorData($(this).parent().find('.tools-content-list-content'), 'DataServer.ashx?uri=' + _Uri, 4);
 
-            $(this).find('i').toggleClass('icon-down').toggleClass('icon-right');
+                if (that.clickSliderType == 'qlik') {
+
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseObjectList?PorductID=" + PorductID + "&AppId=" + appId + "&SheetId=" + sheetId);
+
+                } else if (that.clickSliderType == 'tableau') {
+
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetTableautViewsforWorkBook?PorductID=" + PorductID + "&SiteId=" + appId + "&WorkBookId=" + sheetId);
+                }
+
+                that.FloorData($(this).parent().find('.tools-content-list-content'), 'DataServer.ashx?uri=' + _Uri, 4, appId);
+            }
+
+            $(this).find('i').toggleClass('icons-down').toggleClass('icons-right');
             $(this).parent().find('.tools-content-list-content').toggleClass('hide').toggleClass('show');
-            // $(this).parent().find('.tools-contents').toggleClass('show').toggleClass('hide');
+        });
+    },
+    treeClick: function (firstBtn, secondBtn, thirdBtn) {
+        var that = this;
+        var _Uri = '';
+        alert('outer')
+
+        // $('.QlikSense-list .firstIcon').unbind().on('click', function () {
+        //     alert('ddddd')
+        //     var status = $(this).find('i').hasClass('icons-down');
+        //     var len = $(this).parent().find('.tools-item-content').find('.tools-content').length;
+        //     var PorductID = $(this).attr('data-id');
+        //     productId = PorductID;
+
+        //     if (len == 0 && !status) {
+
+        //         ServerDomainName = $(this).attr('data-server');
+        //         $(this).parent().find('.tools-item-content').html('loading<i class="iconfont icons-loading"></i>');
+
+        //         _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseAppList?PorductID=" + PorductID);
+
+        //         that.FloorData($(this).parent().find('.tools-item-content'), 'DataServer.ashx?uri=' + _Uri, 2);
+
+        //     }
+
+        //     $(this).find('i').toggleClass('icons-down').toggleClass('icons-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+        //     $(this).parent().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+        //     // $(this).parent().siblings().find('.tools-item-content').removeClass('show').addClass('hide');
+        //     // $(this).parent().siblings().find('.firstIcon').find('i').removeClass('icons-down').addClass('icons-right').stop().find('.tools-item-content').removeClass('show').addClass('hide');
+
+        // });
+        // tableau四级菜单的第一级数据
+        firstBtn.unbind().on('click', function () {
+            alert('ddddddddd')
+            var status = $(this).find('i').hasClass('icons-down');
+            var len = $(this).parent().find('.tools-item-content').find('.tools-content').length;
+            var PorductID = $(this).attr('data-id');
+            productId = PorductID;
+            if (len == 0 && !status) {
+
+                ServerDomainName = $(this).attr('data-server');
+                $(this).parent().find('.tools-item-content').html('loading<i class="iconfont icons-loading"></i>');
+                if (that.clickSliderType == 'qlik') {
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseAppList?PorductID=" + PorductID);
+                } else if (that.clickSliderType == 'tableau') {
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetTableauSiteList?PorductID=" + PorductID);
+                }
+
+                that.FloorData($(this).parent().find('.tools-item-content'), 'DataServer.ashx?uri=' + _Uri, 2);
+
+            }
+
+            $(this).find('i').toggleClass('icons-down').toggleClass('icons-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+            $(this).parent().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+            $(this).parent().siblings().find('.tools-item-content').removeClass('show').addClass('hide');
+            $(this).parent().siblings().find('.firstIcon').find('i').removeClass('icons-down').addClass('icons-right').stop().find('.tools-item-content').removeClass('show').addClass('hide');
+            return false
+        });
+
+        secondBtn.unbind().on('click', function () {
+            var status = $(this).find('i').hasClass('icons-down');
+            var len = $(this).parent().find('.tools-contents').find('.tools-content-list').length;
+
+            var PorductID = productId;
+            var appId = $(this).attr('data-id');
+
+
+            if (!status && len == 0) {
+                $(this).parent().find('.tools-contents').html('loading<i class="iconfont icons-loading"></i>');
+
+                if (that.clickSliderType == 'qlik') {
+
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseSheetList?PorductID=" + PorductID + "&AppId=" + appId);
+
+                } else if (that.clickSliderType == 'tableau') {
+
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetTableauWorkBooks?PorductID=" + PorductID + "&SiteId=" + appId);
+                }
+
+                that.FloorData($(this).parent().find('.tools-contents'), 'DataServer.ashx?uri=' + _Uri, 3);
+            }
+
+            $(this).find('i').toggleClass('icons-down').toggleClass('icons-right').stop().find('.tools-item-content').toggleClass('show').toggleClass('hide');
+            $(this).parent().find('.tools-contents').toggleClass('show').toggleClass('hide');
+            // 打开当前折叠其他的
+            // $(this).parent().siblings().find('.tools-contents').removeClass('show').addClass('hide');
+            // $(this).parent().siblings().find('.secondIcon').find('i').removeClass('icons-down').addClass('icons-right').stop().find('.tools-item-content').removeClass('show').addClass('hide');
+        });
+
+        thirdBtn.unbind().on('click', function () {
+
+            var status = $(this).find('i').hasClass('icons-down');
+            var len = $(this).parent().find('.tools-content-list-content').find('.last-content-item').length;
+            var PorductID = productId;
+            var appId = $(this).parent().parent().parent().find('.secondIcon').attr('data-id');
+            var sheetId = $(this).attr('data-id');
+
+            if (!status && len == 0) {
+                $(this).parent().find('.tools-content-list-content').html('loading<i class="iconfont icons-loading"></i>')
+
+
+                if (that.clickSliderType == 'qlik') {
+
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetQlikSenseObjectList?PorductID=" + PorductID + "&AppId=" + appId + "&SheetId=" + sheetId);
+
+                } else if (that.clickSliderType == 'tableau') {
+
+                    _Uri = encodeURIComponent("http://portal.ebistrategy.com:8030/BigScreen/GetTableautViewsforWorkBook?PorductID=" + PorductID + "&SiteId=" + appId + "&WorkBookId=" + sheetId);
+                }
+
+                that.FloorData($(this).parent().find('.tools-content-list-content'), 'DataServer.ashx?uri=' + _Uri, 4, appId);
+            }
+
+            $(this).find('i').toggleClass('icons-down').toggleClass('icons-right');
+            $(this).parent().find('.tools-content-list-content').toggleClass('hide').toggleClass('show');
         });
     }
 }
+
+var targetbox = document.querySelector('.right-content');
+// var dragList = items || [];
+var lines = document.querySelector('.lines')
+var showState1 = document.querySelector('.showState1');
+var showState2 = document.querySelector('.showState2');
+var mask = document.querySelector('.mask');
 
 var $ = window.jQuery;
 var leftConsole = document.querySelector('.left-console');
 var sliderItem = document.querySelectorAll('.slider-item');
 var menuList = document.querySelectorAll('.menuList-item');
 var leftMenu = document.querySelector('.left-menu');
-// var dragList = document.querySelectorAll()
+var iframe = document.querySelector('.iframe')
 var Selector = {
     sliderItem: sliderItem,
     menuList: menuList,
-    leftMenu: leftMenu
+    leftMenu: leftMenu,
+    iframe: iframe
 }
-var sliderBar = new SliderBar($, dragList, leftConsole, Selector);
+var sliderBar = new SliderBar($, leftConsole, Selector);
 sliderBar.init();
 
+var mydrag = new MyDrag(targetbox, lines, [], showState1, showState2, mask);
+mydrag.lines();
+mydrag.showState();
 
+
+
+function getQlik(host, port) {
+    var config = {
+        host: host,
+        prefix: '/',
+        port: port,
+        isSecure: false
+    };
+    require.config({
+        baseUrl: (config.isSecure ? "https://" : "http://") + config.host + (config.port ? ":" + config.port : "") + config.prefix + "resources"
+    });
+
+    var qlikApps = [];
+    var _Qlik;
+
+    function LoadAll() {
+
+        require(["js/qlik"], function (qlik) {
+            _Qlik = qlik;
+            qlik.setOnError(function (error) {
+                alert(error.message);
+            });
+            function attach(elem) {
+                var appid = elem.dataset.qlikAppId;
+                var objid = elem.dataset.qlikObjId;
+                var app = qlikApps[appid];
+                if (!app) {
+                    app = qlik.openApp(appid, config);
+                    app.clearAll();
+                    qlikApps[appid] = app;
+                }
+                app.getObject(elem, objid);
+            }
+            var elems = document.getElementsByClassName('qlik-embed');
+            var ix = 0;
+            for (; ix < elems.length; ++ix) {
+                attach(elems[ix]);
+            }
+        });
+    }
+    LoadAll();
+    function test(appid, objid, eventid) {
+
+        var _app = _Qlik.openApp(appid, config);
+        _app.getObject(eventid, objid);
+    }
+}
 
 
 

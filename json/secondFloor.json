@@ -1,0 +1,258 @@
+[
+    {
+        "id": "1ca8a669-e082-4b8e-80e6-593d223a3766",
+        "name": "Gartner 2016",
+        "appId": "",
+        "publishTime": "2017-05-05T02:53:35.577Z",
+        "published": true,
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null,
+        "stream": {
+            "id": "9e92a187-68b1-4229-97ad-d16286c9c085",
+            "name": "AppForSales",
+            "privileges": null
+        }
+    },
+    {
+        "id": "27dce7e3-40c8-4295-9971-4272bd05db44",
+        "name": "Customer",
+        "appId": "",
+        "publishTime": "2017-07-01T14:10:02.899Z",
+        "published": true,
+        "stream": {
+            "id": "aaec8d41-5201-43ab-809f-3063750dfafd",
+            "name": "Everyone",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "2ce49b06-7c01-47d3-83fa-5eec6252a75f",
+        "name": "易居中国",
+        "appId": "",
+        "publishTime": "2017-04-09T01:48:07.361Z",
+        "published": true,
+        "stream": {
+            "id": "9e92a187-68b1-4229-97ad-d16286c9c085",
+            "name": "AppForSales",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "306b7963-a4c2-4d90-b561-3d0071cfa999",
+        "name": "demo2",
+        "appId": "",
+        "publishTime": "2017-06-12T07:32:59.674Z",
+        "published": true,
+        "stream": {
+            "id": "9e92a187-68b1-4229-97ad-d16286c9c085",
+            "name": "AppForSales",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "340b1a58-f016-4627-bfa8-0b401d895915",
+        "name": "Master Report Demo-v1",
+        "appId": "",
+        "publishTime": "2017-05-05T02:53:46.408Z",
+        "published": true,
+        "stream": {
+            "id": "9e92a187-68b1-4229-97ad-d16286c9c085",
+            "name": "AppForSales",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "36a9bbae-a3aa-4566-bfe8-ef167716e312",
+        "name": "Operations Monitor",
+        "appId": "",
+        "publishTime": "2017-01-17T08:33:39.211Z",
+        "published": true,
+        "stream": {
+            "id": "a70ca8a5-1d59-4cc9-b5fa-6e207978dcaf",
+            "name": "Monitoring apps",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "50b32f9f-1621-429b-ad94-84bfc7e83599",
+        "name": "License Monitor",
+        "appId": "",
+        "publishTime": "2017-01-17T08:33:33.010Z",
+        "published": true,
+        "stream": {
+            "id": "a70ca8a5-1d59-4cc9-b5fa-6e207978dcaf",
+            "name": "Monitoring apps",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 0,
+        "privileges": null
+    },
+    {
+        "id": "5860ad42-5ff1-4c55-b258-e15ed1d5c3a5",
+        "name": "TESTHJ _BAK",
+        "appId": "",
+        "publishTime": "2017-07-17T09:54:58.887Z",
+        "published": true,
+        "stream": {
+            "id": "b8e92f59-5f78-4a53-a34d-c94f6f74cd53",
+            "name": "test",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "79777a4e-efd4-43c0-9a55-2b5d07a5424d",
+        "name": "销售分析 WeChat",
+        "appId": "",
+        "publishTime": "2017-01-17T09:03:37.873Z",
+        "published": true,
+        "stream": {
+            "id": "aaec8d41-5201-43ab-809f-3063750dfafd",
+            "name": "Everyone",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "7b21f63c-feef-4055-ab0e-d6bee1b2ae47",
+        "name": "bestseller",
+        "appId": "",
+        "publishTime": "2017-05-05T02:53:20.924Z",
+        "published": true,
+        "stream": {
+            "id": "9e92a187-68b1-4229-97ad-d16286c9c085",
+            "name": "AppForSales",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "7f944f48-8c75-40cd-b5fd-1f77c13c95c5",
+        "name": "TESTHJ",
+        "appId": "",
+        "publishTime": "2017-06-29T02:29:14.087Z",
+        "published": true,
+        "stream": {
+            "id": "a70ca8a5-1d59-4cc9-b5fa-6e207978dcaf",
+            "name": "Monitoring apps",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "8153c0fa-0380-45ea-9f19-192c884cf6a6",
+        "name": "Auto_Demo",
+        "appId": "",
+        "publishTime": "2017-05-05T02:53:13.354Z",
+        "published": true,
+        "stream": {
+            "id": "9e92a187-68b1-4229-97ad-d16286c9c085",
+            "name": "AppForSales",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "addd0630-043c-43b9-b4e9-2fa0123bd447",
+        "name": "Test",
+        "appId": "",
+        "publishTime": "2017-04-18T02:28:08.636Z",
+        "published": true,
+        "stream": {
+            "id": "9e92a187-68b1-4229-97ad-d16286c9c085",
+            "name": "AppForSales",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "c8d60763-2e44-483f-b105-a603544ce765",
+        "name": "Delta副本",
+        "appId": "",
+        "publishTime": "2017-05-05T02:53:28.751Z",
+        "published": true,
+        "stream": {
+            "id": "9e92a187-68b1-4229-97ad-d16286c9c085",
+            "name": "AppForSales",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "e59cc0c8-8be9-476b-9868-5cbabdabcd6b",
+        "name": "EBI Report",
+        "appId": "",
+        "publishTime": "2017-07-28T05:52:56.614Z",
+        "published": true,
+        "stream": {
+            "id": "9e92a187-68b1-4229-97ad-d16286c9c085",
+            "name": "AppForSales",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    },
+    {
+        "id": "f9450afc-673e-423b-b1af-cc6bb0ff2414",
+        "name": "sss",
+        "appId": "",
+        "publishTime": "2017-07-17T09:02:47.552Z",
+        "published": true,
+        "stream": {
+            "id": "b8e92f59-5f78-4a53-a34d-c94f6f74cd53",
+            "name": "test",
+            "privileges": null
+        },
+        "savedInProductVersion": "11.0.0",
+        "migrationHash": "82b8362010f6f32f12217392e08c75194db0d4fc",
+        "availabilityStatus": 1,
+        "privileges": null
+    }
+]

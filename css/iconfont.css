@@ -15,13 +15,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-right:before { content: "\e65b"; }
+.icons-right:before { content: "\e65b"; }
 
-.icon-worksheet:before { content: "\e689"; }
+.icons-worksheet:before { content: "\e689"; }
 
-.icon-loading:before { content: "\e683"; }
+.icons-loading:before { content: "\e683"; }
 
-.icon-down:before { content: "\e600"; }
+.icons-down:before { content: "\e600"; }
 
-.icon-datasheet:before { content: "\e618"; }
+.icons-datasheet:before { content: "\e618"; }
 
